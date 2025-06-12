@@ -133,7 +133,7 @@ const Login = ()=>{
         name="password"
       />
       
-            <Button title="Log In" onPress={handleSubmit(onSubmit)} />
+            <Button  title="Log In" onPress={handleSubmit(onSubmit)} />
             <View style={styles.assistContainer}  >
             <Text style={styles.forgotPassword} >Forgot Password</Text>
             <Text  style={styles.forgotPassword}>New User? Sign Up</Text>

@@ -1,8 +1,6 @@
 import { useTheme } from "@/theme/themeProvider";
-import { ReactNode } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
-import { PressableProps } from "react-native-gesture-handler";
-
+import { CircularProgress } from '@expo/ui/jetpack-compose';
 const Button = (props:any)=>{
     const {theme} = useTheme()
     const styles = StyleSheet.create({
@@ -22,9 +20,17 @@ const Button = (props:any)=>{
     })
     return(
         <Pressable {...props} style={styles.button} >
-            <Text style={styles.label}>
-            {props.title}
-            </Text>
+            {
+                props.loading?
+                (
+                    <CircularProgress progress={0.5} style={{ width: 300 }} color="blue" elementColors={{ trackColor: '#cccccc' }}/>
+                ):(
+                    <Text style={styles.label}>
+                    {props.title}
+                    </Text>
+                )
+            }
+            
         </Pressable>
     )
 
