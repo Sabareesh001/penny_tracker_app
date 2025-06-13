@@ -1,5 +1,5 @@
 import { useTheme } from "@/theme/themeProvider";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CircularProgress } from '@expo/ui/jetpack-compose';
 const Button = (props:any)=>{
     const {theme} = useTheme()
@@ -7,11 +7,15 @@ const Button = (props:any)=>{
         button:{
             width:'100%',
             alignItems:'center',
+            justifyContent:'center',
             borderWidth:theme?.border.borderWidth,
             borderColor:theme?.border.color,
             padding:theme?.button.primary.padding,
             borderRadius:theme?.border.radius,
             backgroundColor:theme?.colors.primary,
+        },
+        content:{
+            height:30,
         },
         label:{
             color:theme?.colors.secondary,
@@ -19,17 +23,19 @@ const Button = (props:any)=>{
         }
     })
     return(
-        <Pressable {...props} style={styles.button} >
+        <Pressable {...props} disabled={props.loading} style={styles.button} >
+            <View style={styles.content}>
             {
                 props.loading?
                 (
-                    <CircularProgress progress={0.5} style={{ width: 300 }} color="blue" elementColors={{ trackColor: '#cccccc' }}/>
+                    <CircularProgress progress={null} style={{ width: 28, height:28 }}  color={theme?.colors.secondary} elementColors={{ trackColor: 'transparent' }}/>
                 ):(
                     <Text style={styles.label}>
                     {props.title}
                     </Text>
                 )
             }
+            </View>
             
         </Pressable>
     )
