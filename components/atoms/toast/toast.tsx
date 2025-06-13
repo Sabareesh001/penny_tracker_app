@@ -1,5 +1,5 @@
 import { useTheme } from "@/theme/themeProvider";
-import Toast, { BaseToast, ErrorToast, SuccessToast } from "react-native-toast-message"
+import Toast, { BaseToast, ErrorToast, InfoToast, SuccessToast } from "react-native-toast-message"
 
 const ToastStyled = ()=>{
     const {theme} = useTheme()
@@ -44,6 +44,24 @@ const ToastStyled = ()=>{
                 }}
               />
             ),
+            info:(props)=>(
+                <InfoToast
+                {...props}
+                 style={{
+                    backgroundColor:theme?.colors.primary,
+                    borderLeftColor:theme?.colors.info.info,
+                }}
+                text1Style={
+                    {
+                    color:theme?.colors.info.text,
+                    fontSize:theme?.text.section.label.fontSize
+                    }
+                }
+                text2Style={{
+                    color:theme?.colors.info.info
+                }}
+                />
+            )
         }}
         
         />

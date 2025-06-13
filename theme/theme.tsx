@@ -4,7 +4,10 @@ type Theme = {
     colors : {
         primary:string,
         secondary:string,
-        info:string,
+        info:{
+            text : string,
+            info : string
+        },
         danger:{
             text : string,
             danger : string
@@ -55,7 +58,10 @@ const darkTheme = {
         primary:"#caf0f8",
         secondary:"#03045e",
         section:"#023e8a",
-        info:"",
+        info:{
+            info : "#ff7800",
+            text : "#ff7800"
+        },
         danger:{
             danger : "#e4002d",
             text : "#e4002d"
@@ -73,8 +79,11 @@ const lightTheme = {
     colors : {
         primary:"#03045e",
         secondary:"#caf0f8",
-        info:"",
         section:"#48cae4",
+        info:{
+            info : "#ff7800",
+            text : "#caf0f8"
+        },
         danger:{
             text:"#caf0f8",
             danger : "#e4002d"

@@ -4,13 +4,13 @@ import { Label } from "@/components/atoms/label/label"
 import { TextField } from "@/components/atoms/textField/textField"
 import { useTheme } from "@/theme/themeProvider"
 import axios, { toFormData } from "axios"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { StyleSheet, Text, TextInput, View } from "react-native"
 import Toast from "react-native-toast-message"
 const Login = ()=>{
   
-
+    const [loading,setLoading] = useState(false);
     const BASE_URL = process.env.EXPO_PUBLIC_API_URL
 
       const {
@@ -24,18 +24,30 @@ const Login = ()=>{
     },
   })
     const onSubmit = (data:any) => {
-        axios.post(`${BASE_URL}/api/v1/user/auth/userpass`,data).then((res)=>{
+       setLoading(true)
+       const controller =  new AbortController
+        axios.post(`${BASE_URL}/api/v1/user/auth/userpass`,data,{timeout:5000,timeoutErrorMessage:"Server is not responding"}).then((res)=>{
            Toast.show({
               type:'success',
               text1:res.data.message
             })
-        }).catch((error)=>{
+          }).catch((error)=>{
+            if(!error.response){
+              Toast.show({
+                type:'info',
+                text1:error.message
+              })
+              return;
+            }
             Toast.show({
               type:'error',
               text1:error.response.data.error
             })
             console.log(error.response.data)
-        })
+          }).finally(()=>{
+            setLoading(false)
+          })
+          
       }
       
       useEffect(()=>{
@@ -133,7 +145,7 @@ const Login = ()=>{
         name="password"
       />
       
-            <Button title="Log In" onPress={handleSubmit(onSubmit)} />
+            <Button loading={loading}  title="Log In" onPress={handleSubmit(onSubmit)} />
             <View style={styles.assistContainer}  >
             <Text style={styles.forgotPassword} >Forgot Password</Text>
             <Text  style={styles.forgotPassword}>New User? Sign Up</Text>
