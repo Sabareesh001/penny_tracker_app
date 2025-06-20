@@ -3,6 +3,7 @@ import { useColorScheme } from "react-native"
 type Theme = {
     colors : {
         primary:string,
+        primaryDisabled:string,
         secondary:string,
         info:{
             text : string,
@@ -56,6 +57,7 @@ type Theme = {
 const darkTheme = {
     colors : {
         primary:"#caf0f8",
+        primaryDisabled:"#83999e",
         secondary:"#03045e",
         section:"#023e8a",
         info:{
@@ -78,6 +80,7 @@ const darkTheme = {
 const lightTheme = {
     colors : {
         primary:"#03045e",
+        primaryDisabled:"#b1b2c9",
         secondary:"#caf0f8",
         section:"#48cae4",
         info:{

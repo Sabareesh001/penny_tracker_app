@@ -1,7 +1,7 @@
 import { useTheme } from "@/theme/themeProvider";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { GestureResponderEvent, Pressable, StyleSheet, Text, View } from "react-native";
 import { CircularProgress } from '@expo/ui/jetpack-compose';
-const Button = (props:any)=>{
+const Button = ({loading,title,onPress,inverted,disabled}:{loading?:boolean,title:string,onPress:((event: GestureResponderEvent) => void),inverted?:boolean,disabled?:boolean})=>{
     const {theme} = useTheme()
     const styles = StyleSheet.create({
         button:{
@@ -9,10 +9,17 @@ const Button = (props:any)=>{
             alignItems:'center',
             justifyContent:'center',
             borderWidth:theme?.border.borderWidth,
-            borderColor:theme?.border.color,
             padding:theme?.button.primary.padding,
             borderRadius:theme?.border.radius,
+            borderColor:theme?.border.color,
             backgroundColor:theme?.colors.primary,
+        },
+        buttonDisabled:{
+           backgroundColor:theme?.colors.primaryDisabled,
+        },
+        buttonInvert:{
+             borderColor:theme?.border.color,
+            backgroundColor:theme?.colors.secondary,
         },
         content:{
             height:30,
@@ -21,17 +28,21 @@ const Button = (props:any)=>{
             color:theme?.colors.secondary,
             fontSize:theme?.button.primary.fontSize,
         }
+        ,
+        labelInverted : {
+            color:theme?.colors.primary
+        }
     })
     return(
-        <Pressable {...props} disabled={props.loading} style={styles.button} >
+        <Pressable onPress={onPress} disabled={loading || disabled} style={{...styles.button,...(inverted && styles.buttonInvert),...(disabled && styles.buttonDisabled)}} >
             <View style={styles.content}>
             {
-                props.loading?
+                loading?
                 (
                     <CircularProgress progress={null} style={{ width: 28, height:28 }}  color={theme?.colors.secondary} elementColors={{ trackColor: 'transparent' }}/>
                 ):(
-                    <Text style={styles.label}>
-                    {props.title}
+                    <Text style={{...styles.label,...(inverted && styles.labelInverted)}}>
+                    {title}
                     </Text>
                 )
             }

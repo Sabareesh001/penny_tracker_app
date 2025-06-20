@@ -4,15 +4,17 @@ import { Label } from "@/components/atoms/label/label"
 import { TextField } from "@/components/atoms/textField/textField"
 import { useTheme } from "@/theme/themeProvider"
 import axios, { toFormData } from "axios"
+import { Link } from "expo-router"
 import { useEffect, useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { StyleSheet, Text, TextInput, View } from "react-native"
 import Toast from "react-native-toast-message"
+import { BASE_URL } from "../utils/apiHost"
+import { FormErrorHandler } from "@/components/handlers/error"
 const Login = ()=>{
   
     const [loading,setLoading] = useState(false);
-    const BASE_URL = process.env.EXPO_PUBLIC_API_URL
-
+   
       const {
     control,
     handleSubmit,
@@ -25,7 +27,6 @@ const Login = ()=>{
   })
     const onSubmit = (data:any) => {
        setLoading(true)
-       const controller =  new AbortController
         axios.post(`${BASE_URL}/api/v1/user/auth/userpass`,data,{timeout:5000,timeoutErrorMessage:"Server is not responding"}).then((res)=>{
            Toast.show({
               type:'success',
@@ -50,29 +51,16 @@ const Login = ()=>{
           
       }
       
-      useEffect(()=>{
-      if(!errors.username){
-        return
-      }
-      const name:string = (errors.username?.ref)?errors.username?.ref?.name:""
-      console.log(errors.username?.ref)
-         Toast.show({
-          type:'error',
-          text1: `${name[0]?.toUpperCase()}${name.substring(1)}`+"  " + (errors.username?.type=='maxLength'?"max length reached":errors.username?.type)
-        })
-      },[errors.username])
-
-    useEffect(()=>{
-      if(!errors.password || errors.username){
-        return
-      }
-      const name:string = (errors.password?.ref)?errors.password?.ref?.name:""
-      console.log(errors.password?.ref)
-         Toast.show({
-          type:'error',
-          text1: `${name[0]?.toUpperCase()}${name.substring(1)}`+"  "+ errors.password?.type
-         })
-    },[errors.password])
+    const handleFormError = ()=>{
+          if(errors.username){
+            console.log(errors.username)
+            FormErrorHandler("User Name",errors.username.type)
+          }
+          else if(errors.password){
+            FormErrorHandler("Password",errors.password.type)
+          }
+    }
+     
 
     const {setBackground,theme} = useTheme()
     const styles  = StyleSheet.create({
@@ -84,7 +72,6 @@ const Login = ()=>{
             padding : theme?.paddings.screen
         },
         loginSection:{
-           
             padding:theme?.border.padding,
             gap:theme?.gaps.form,
             width:'100%',
@@ -145,10 +132,10 @@ const Login = ()=>{
         name="password"
       />
       
-            <Button loading={loading}  title="Log In" onPress={handleSubmit(onSubmit)} />
+            <Button loading={loading}  title="Log In" onPress={handleSubmit(onSubmit,handleFormError)} />
             <View style={styles.assistContainer}  >
-            <Text style={styles.forgotPassword} >Forgot Password</Text>
-            <Text  style={styles.forgotPassword}>New User? Sign Up</Text>
+            <Link href={"/"} style={styles.forgotPassword} >Forgot Password</Link>
+            <Link href={"/signup/0"} style={styles.forgotPassword}>New User? Sign Up</Link>
             </View>
             </View>
         </View>

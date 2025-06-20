@@ -5,7 +5,9 @@ const ToastStyled = ()=>{
     const {theme} = useTheme()
     return(
         <Toast
-
+        autoHide
+        swipeable
+        visibilityTime={1000}
         config={{
             
             error:(props)=>(

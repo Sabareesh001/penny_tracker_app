@@ -1,7 +1,7 @@
 import { useTheme } from "@/theme/themeProvider";
-import { StyleSheet, TextInput } from "react-native";
+import { StyleSheet, TextInput, TextInputProps } from "react-native";
 
-const TextField = (props:any)=>{
+const TextField = (props:TextInputProps & {error?:boolean})=>{
     const {theme} = useTheme()
     const styles = StyleSheet.create({
         textInput:{
@@ -10,11 +10,14 @@ const TextField = (props:any)=>{
             padding:theme?.border.padding,
             borderRadius:theme?.border.radius,
             color:theme?.colors.input,
-            fontSize: theme?.text.section.label.fontSize
+            fontSize: theme?.text.section.label.fontSize,
+        },
+        textInputError:{
+             borderColor:theme?.colors.danger.danger,
         }
     })
     return(
-        <TextInput {...props}  style={styles.textInput}>
+        <TextInput {...props}  style={{...styles.textInput,...(props?.error && styles.textInputError)}}>
         </TextInput>
     )
 }
