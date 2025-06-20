@@ -2,22 +2,23 @@ import { Button } from "@/components/atoms/button/button"
 import { SectionHeading } from "@/components/atoms/heading/heading"
 import { Label } from "@/components/atoms/label/label"
 import { TextField } from "@/components/atoms/textField/textField"
+import { FormErrorHandler } from "@/components/handlers/error"
 import { useTheme } from "@/theme/themeProvider"
-import axios, { toFormData } from "axios"
+import axios from "axios"
 import { Link } from "expo-router"
 import { useEffect, useState } from "react"
-import { useForm, Controller } from "react-hook-form"
-import { StyleSheet, Text, TextInput, View } from "react-native"
+import { Controller, useForm } from "react-hook-form"
+import { KeyboardAvoidingView, StyleSheet, View } from "react-native"
 import Toast from "react-native-toast-message"
 import { BASE_URL } from "../utils/apiHost"
-import { FormErrorHandler } from "@/components/handlers/error"
 const Login = ()=>{
   
+    const [valid,setValid] = useState(false);
     const [loading,setLoading] = useState(false);
-   
       const {
     control,
     handleSubmit,
+    trigger,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -91,10 +92,20 @@ const Login = ()=>{
             setBackground(theme?theme.colors.secondary:"")
         }
     },[theme])
+
+    const getValidation = async()=>{
+       const validCred = await trigger(['username','password']);
+       if(errors?.username?.type=='maxLength'){
+          FormErrorHandler('Username',errors.username.type);
+       }
+
+       setValid(validCred);
+       
+    }
      
     return(
         <View style={styles.loginContainer}>
-            <View style={styles.loginSection}>
+            <KeyboardAvoidingView behavior="padding" style={styles.loginSection}>
             <SectionHeading>Login</SectionHeading>
             <Label>Username</Label>
                 <Controller
@@ -108,7 +119,7 @@ const Login = ()=>{
         render={({ field: { onChange, onBlur, value } }) => (
           <TextField
             onBlur={onBlur}
-            onChangeText={onChange}
+            onChangeText={async(v)=>{onChange(v); await getValidation() }}
             value={value}
           />
         )}
@@ -125,19 +136,19 @@ const Login = ()=>{
           <TextField
             secureTextEntry
             onBlur={onBlur}
-            onChangeText={onChange}
+            onChangeText={async(v)=>{onChange(v);await getValidation();}}
             value={value}
           />
         )}
         name="password"
       />
       
-            <Button loading={loading}  title="Log In" onPress={handleSubmit(onSubmit,handleFormError)} />
+            <Button disabled={!valid} loading={loading}  title="Log In" onPress={handleSubmit(onSubmit,handleFormError)} />
             <View style={styles.assistContainer}  >
             <Link href={"/"} style={styles.forgotPassword} >Forgot Password</Link>
             <Link href={"/signup/0"} style={styles.forgotPassword}>New User? Sign Up</Link>
             </View>
-            </View>
+            </KeyboardAvoidingView>
         </View>
     )
 }
