@@ -157,7 +157,7 @@ const Section2 = ({
                 onChange(Math.floor(age));
                 await getValidation();
               }}
-              style={{ height: 20 }}
+              style={{ height: 20, width: "100%" }}
               value={value}
             />
           </>
@@ -174,9 +174,12 @@ const Section2 = ({
             dropDownDirection="TOP"
             open={genderOpen}
             setOpen={setGenderOpen}
-            setValue={async (v) => {
+            onChangeValue={async (v) => {
               onChange(v);
               await getValidation();
+            }}
+            setValue={(v) => {
+              onChange(v);
             }}
             value={value}
             items={genderItems}
@@ -194,9 +197,12 @@ const Section2 = ({
             dropDownDirection="TOP"
             open={countryOpen}
             setOpen={setCountryOpen}
-            setValue={async (v) => {
+            onChangeValue={async (v) => {
               onChange(v);
               await getValidation();
+            }}
+            setValue={(v) => {
+              onChange(v);
             }}
             value={value}
             items={countryItems}
@@ -214,9 +220,12 @@ const Section2 = ({
             dropDownDirection="TOP"
             open={occupationOpen}
             setOpen={setOccupationOpen}
-            setValue={async (v) => {
+            onChangeValue={async (v) => {
               onChange(v);
               await getValidation();
+            }}
+            setValue={(v) => {
+              onChange(v);
             }}
             value={value}
             items={occupationItems}

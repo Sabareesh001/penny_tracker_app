@@ -46,6 +46,7 @@ const Section1 = ({
       color: theme?.colors.text,
       textDecorationLine: "underline",
       textAlign: "center",
+      alignSelf:'center'
     },
   });
 

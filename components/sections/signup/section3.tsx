@@ -1,15 +1,20 @@
+import { BASE_URL } from "@/app/utils/apiHost";
 import { Button } from "@/components/atoms/button/button";
 import { Label } from "@/components/atoms/label/label";
 import { TextField } from "@/components/atoms/textField/textField";
 import { FormErrorHandler } from "@/components/handlers/error";
+import { SomethingWentWrong } from "@/components/toasts/toasts";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import {
   Control,
   Controller,
   FieldErrors,
   UseFormGetValues,
+  UseFormHandleSubmit,
   UseFormTrigger,
 } from "react-hook-form";
+import Toast from "react-native-toast-message";
 import { FormFields } from "./types";
 
 type section3Fields = {
@@ -22,12 +27,14 @@ const Section3 = ({
   control,
   errors,
   trigger,
+  handleSubmit,
   setCurrentSection,
   getFieldValue,
 }: {
   control: Control<FormFields, any, FormFields>;
   errors: FieldErrors<FormFields>;
   trigger: UseFormTrigger<FormFields>;
+  handleSubmit: UseFormHandleSubmit<FormFields>;
   setCurrentSection: React.Dispatch<React.SetStateAction<number>>;
   getFieldValue: UseFormGetValues<FormFields>;
 }) => {
@@ -65,7 +72,7 @@ const Section3 = ({
     getValidation();
   }, []);
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: any) => {
     const validSection = await getValidation();
     if (!validSection) {
       if (errors?.username) {
@@ -83,6 +90,22 @@ const Section3 = ({
       }
       return;
     }
+
+    axios
+      .post(`${BASE_URL}/api/v1/user/register`, data)
+      .then((res) => {
+        Toast.show({ type: "success", text1: res.data.message });
+      })
+      .catch((error) => {
+        if (error?.response?.data?.error) {
+          Toast.show({
+            type: "error",
+            text1: error.response.data.error,
+          });
+        } else {
+          SomethingWentWrong();
+        }
+      });
   };
 
   return (
@@ -102,6 +125,9 @@ const Section3 = ({
         render={({ field: { value, onChange } }) => (
           <>
             <TextField
+              note="Username must start with alphabet and should not contain special characters"
+              errorNote={!valid[0]}
+              autoCapitalize="none"
               error={!valid[0]}
               onChangeText={async (e) => {
                 onChange(e.trim());
@@ -131,6 +157,7 @@ const Section3 = ({
         render={({ field: { value, onChange } }) => (
           <>
             <TextField
+              note="Password must not contain spaces"
               error={!valid[1]}
               secureTextEntry
               onChangeText={async (e) => {
@@ -144,7 +171,7 @@ const Section3 = ({
         name="password"
       />
       <Label error={!valid[2]} required>
-        Confim Password
+        Confirm Password
       </Label>
       <Controller
         rules={{
@@ -157,7 +184,7 @@ const Section3 = ({
             <TextField
               error={!valid[2]}
               secureTextEntry
-              onChangeText={async(e) => {
+              onChangeText={async (e) => {
                 onChange(e);
                 await getValidation("confirmPassword");
               }}
@@ -176,7 +203,7 @@ const Section3 = ({
       />
       <Button
         disabled={!valid[0] || !valid[1] || !valid[2]}
-        onPress={onSubmit}
+        onPress={handleSubmit(onSubmit)}
         title={"Submit"}
       />
     </>

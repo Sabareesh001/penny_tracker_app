@@ -28,7 +28,8 @@ type Theme = {
         padding:number
     },
     gaps:{
-        form : number
+        form : number,
+        info: number
     },
     text:{
         section:{
@@ -40,6 +41,9 @@ type Theme = {
                 fontSize:number,
                 color:string
             }
+        },
+        note:{
+            fontSize:number
         }
     },
     paddings:{
@@ -121,10 +125,16 @@ const getTheme = (colorScheme:string):Theme=>{
                 color:"#caf0f8",
                 fontSize:14
             }
-        }}
+        },
+        note:{
+           fontSize:11
+        }
+    }
+
         ,
         gaps:{
-            form:15
+            form:15,
+            info:3,
         },
         paddings:{
             screen : 50

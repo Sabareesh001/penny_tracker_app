@@ -52,6 +52,7 @@ export default function SignUp() {
     />,
     <Section3
       trigger={trigger}
+      handleSubmit={handleSubmit}
       getFieldValue={getValues}
       errors={errors}
       setCurrentSection={setCurrentSection}
@@ -77,13 +78,19 @@ export default function SignUp() {
       gap: theme?.gaps.form,
       width: "100%",
     },
+    fields: {
+      alignItems: "flex-start",
+      gap: theme?.gaps.form,
+    },
   });
 
   return (
     <View style={styles.signUpContainer}>
       <KeyboardAvoidingView behavior="padding" style={styles.signUpSection}>
         <SectionHeading>Sign Up</SectionHeading>
+        <View style={styles.fields}>
         {sections && sections[currentSection]}
+        </View>
       </KeyboardAvoidingView>
     </View>
   );

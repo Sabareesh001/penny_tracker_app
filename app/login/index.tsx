@@ -103,54 +103,68 @@ const Login = ()=>{
        
     }
      
-    return(
-        <View style={styles.loginContainer}>
-            <KeyboardAvoidingView behavior="padding" style={styles.loginSection}>
-            <SectionHeading>Login</SectionHeading>
-            <Label>Username</Label>
-                <Controller
-        control={control}
-        rules={{
-          required: true,
-          maxLength:20,
-          
-        }}
-        
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextField
-            onBlur={onBlur}
-            onChangeText={async(v)=>{onChange(v); await getValidation() }}
-            value={value}
+    return (
+      <View style={styles.loginContainer}>
+        <KeyboardAvoidingView behavior="padding" style={styles.loginSection}>
+          <SectionHeading>Login</SectionHeading>
+          <Label>Username</Label>
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+              maxLength: 20,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextField
+                autoCapitalize="none"
+                onBlur={onBlur}
+                onChangeText={async (v) => {
+                  onChange(v);
+                  await getValidation();
+                }}
+                value={value}
+              />
+            )}
+            name="username"
           />
-        )}
-        name="username"
-      />
-            <Label>Password</Label>
-                  <Controller
-        control={control}
-        rules={{
-          required:true,
-          maxLength: 100,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextField
-            secureTextEntry
-            onBlur={onBlur}
-            onChangeText={async(v)=>{onChange(v);await getValidation();}}
-            value={value}
+          <Label>Password</Label>
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+              maxLength: 100,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextField
+                secureTextEntry
+                onBlur={onBlur}
+                onChangeText={async (v) => {
+                  onChange(v);
+                  await getValidation();
+                }}
+                value={value}
+              />
+            )}
+            name="password"
           />
-        )}
-        name="password"
-      />
-      
-            <Button disabled={!valid} loading={loading}  title="Log In" onPress={handleSubmit(onSubmit,handleFormError)} />
-            <View style={styles.assistContainer}  >
-            <Link href={"/"} style={styles.forgotPassword} >Forgot Password</Link>
-            <Link href={"/signup/0"} style={styles.forgotPassword}>New User? Sign Up</Link>
-            </View>
-            </KeyboardAvoidingView>
-        </View>
-    )
+
+          <Button
+            disabled={!valid}
+            loading={loading}
+            title="Log In"
+            onPress={handleSubmit(onSubmit, handleFormError)}
+          />
+          <View style={styles.assistContainer}>
+            <Link href={"/"} style={styles.forgotPassword}>
+              Forgot Password
+            </Link>
+            <Link href={"/signup/0"} style={styles.forgotPassword}>
+              New User? Sign Up
+            </Link>
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+    );
 }
 
 export default Login
