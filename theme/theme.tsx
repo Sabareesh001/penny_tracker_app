@@ -3,6 +3,7 @@ import { useColorScheme } from "react-native"
 type Theme = {
     colors : {
         primary:string,
+        primaryDisabled:string,
         secondary:string,
         info:{
             text : string,
@@ -27,7 +28,8 @@ type Theme = {
         padding:number
     },
     gaps:{
-        form : number
+        form : number,
+        info: number
     },
     text:{
         section:{
@@ -39,6 +41,9 @@ type Theme = {
                 fontSize:number,
                 color:string
             }
+        },
+        note:{
+            fontSize:number
         }
     },
     paddings:{
@@ -56,6 +61,7 @@ type Theme = {
 const darkTheme = {
     colors : {
         primary:"#caf0f8",
+        primaryDisabled:"#83999e",
         secondary:"#03045e",
         section:"#023e8a",
         info:{
@@ -78,6 +84,7 @@ const darkTheme = {
 const lightTheme = {
     colors : {
         primary:"#03045e",
+        primaryDisabled:"#b1b2c9",
         secondary:"#caf0f8",
         section:"#48cae4",
         info:{
@@ -118,10 +125,16 @@ const getTheme = (colorScheme:string):Theme=>{
                 color:"#caf0f8",
                 fontSize:14
             }
-        }}
+        },
+        note:{
+           fontSize:11
+        }
+    }
+
         ,
         gaps:{
-            form:15
+            form:15,
+            info:3,
         },
         paddings:{
             screen : 50
