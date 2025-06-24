@@ -3,8 +3,14 @@ import {
   Section1,
   section1Defaults,
 } from "@/components/sections/signup/section1";
-import { Section2, section2Defaults } from "@/components/sections/signup/section2";
-import { Section3, section3Defaults } from "@/components/sections/signup/section3";
+import {
+  Section2,
+  section2Defaults,
+} from "@/components/sections/signup/section2";
+import {
+  Section3,
+  section3Defaults,
+} from "@/components/sections/signup/section3";
 import { useTheme } from "@/theme/themeProvider";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -19,6 +25,7 @@ export default function SignUp() {
     control,
     trigger,
     getFieldState,
+    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -36,8 +43,20 @@ export default function SignUp() {
       setCurrentSection={setCurrentSection}
       control={control}
     />,
-    <Section2 control={control} />,
-    <Section3 control={control} />,
+    <Section2
+      trigger={trigger}
+      getFieldState={getFieldState}
+      errors={errors}
+      setCurrentSection={setCurrentSection}
+      control={control}
+    />,
+    <Section3
+      trigger={trigger}
+      getFieldValue={getValues}
+      errors={errors}
+      setCurrentSection={setCurrentSection}
+      control={control}
+    />,
   ];
   useEffect(() => {
     if (setBackground) {

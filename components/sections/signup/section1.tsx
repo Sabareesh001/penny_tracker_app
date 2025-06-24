@@ -4,7 +4,7 @@ import { TextField } from "@/components/atoms/textField/textField";
 import { FormErrorHandler } from "@/components/handlers/error";
 import { useTheme } from "@/theme/themeProvider";
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Control,
   Controller,
@@ -22,8 +22,6 @@ type section1Fields = {
   email: string;
   phone: string;
 };
-
-
 
 
 const Section1 = ({
@@ -50,6 +48,10 @@ const Section1 = ({
       textAlign: "center",
     },
   });
+
+  useEffect(()=>{
+      getValidation();
+  },[])
 
   const getValidation = async (error?: boolean) => {
     const validCreds = await trigger([

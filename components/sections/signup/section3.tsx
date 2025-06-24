@@ -1,8 +1,15 @@
 import { Button } from "@/components/atoms/button/button";
 import { Label } from "@/components/atoms/label/label";
 import { TextField } from "@/components/atoms/textField/textField";
-import { navigate } from "expo-router/build/global-state/routing";
-import { Control, Controller } from "react-hook-form";
+import { FormErrorHandler } from "@/components/handlers/error";
+import { useEffect, useState } from "react";
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  UseFormGetValues,
+  UseFormTrigger,
+} from "react-hook-form";
 import { FormFields } from "./types";
 
 type section3Fields = {
@@ -13,19 +20,92 @@ type section3Fields = {
 
 const Section3 = ({
   control,
+  errors,
+  trigger,
+  setCurrentSection,
+  getFieldValue,
 }: {
   control: Control<FormFields, any, FormFields>;
+  errors: FieldErrors<FormFields>;
+  trigger: UseFormTrigger<FormFields>;
+  setCurrentSection: React.Dispatch<React.SetStateAction<number>>;
+  getFieldValue: UseFormGetValues<FormFields>;
 }) => {
+  const [valid, setValid] = useState([true, true, true]);
+
+  const getValidation = async (
+    target?: "username" | "password" | "confirmPassword"
+  ) => {
+    const validCred = await trigger([
+      "username",
+      "password",
+      "confirmPassword",
+    ]);
+    const targetIndices: Record<string, number> = {
+      username: 0,
+      password: 1,
+      confirmPassword: 2,
+    };
+    const updateError = (target: string, valid: boolean) => {
+      setValid((prev) => {
+        const newPrev = [...prev];
+        newPrev[targetIndices[target]] = valid;
+        return newPrev;
+      });
+    };
+    if (target) {
+      updateError(target, errors[target] == null);
+    } else {
+    }
+
+    return validCred;
+  };
+
+  useEffect(() => {
+    getValidation();
+  }, []);
+
+  const onSubmit = async () => {
+    const validSection = await getValidation();
+    if (!validSection) {
+      if (errors?.username) {
+        FormErrorHandler("Username", errors.username.type);
+      } else if (errors?.password) {
+        FormErrorHandler("Password", errors.password.type);
+      } else if (errors?.confirmPassword) {
+        FormErrorHandler(
+          "Confirm Password",
+          errors.confirmPassword.type,
+          "Password Must Match"
+        );
+      } else {
+        FormErrorHandler();
+      }
+      return;
+    }
+  };
+
   return (
     <>
-      <Label required>Username</Label>
+      <Label error={!valid[0]} required>
+        Username
+      </Label>
       <Controller
+        rules={{
+          required: true,
+          pattern: {
+            value: /^[A-Z]+[0-9]*$/gi,
+            message: "",
+          },
+        }}
         control={control}
         render={({ field: { value, onChange } }) => (
           <>
             <TextField
-              onChange={(e) => {
-                onChange(e.target);
+              error={!valid[0]}
+              onChangeText={async (e) => {
+                onChange(e.trim());
+                await getValidation("username");
               }}
               value={value}
             />
@@ -33,15 +113,29 @@ const Section3 = ({
         )}
         name="username"
       />
-      <Label required>Password</Label>
+      <Label error={!valid[1]} required>
+        Password
+      </Label>
       <Controller
+        rules={{
+          required: {
+            value: true,
+            message: "",
+          },
+          pattern: {
+            value: /^\S*$/gi,
+            message: "",
+          },
+        }}
         control={control}
         render={({ field: { value, onChange } }) => (
           <>
             <TextField
+              error={!valid[1]}
               secureTextEntry
-              onChange={(e) => {
-                onChange(e.target);
+              onChangeText={async (e) => {
+                onChange(e);
+                await getValidation("password");
               }}
               value={value}
             />
@@ -49,15 +143,23 @@ const Section3 = ({
         )}
         name="password"
       />
-      <Label required>Confim Password</Label>
+      <Label error={!valid[2]} required>
+        Confim Password
+      </Label>
       <Controller
+        rules={{
+          required: true,
+          validate: (v) => v === getFieldValue("password"),
+        }}
         control={control}
         render={({ field: { value, onChange } }) => (
           <>
             <TextField
+              error={!valid[2]}
               secureTextEntry
-              onChange={(e) => {
-                onChange(e.target);
+              onChangeText={async(e) => {
+                onChange(e);
+                await getValidation("confirmPassword");
               }}
               value={value}
             />
@@ -69,10 +171,14 @@ const Section3 = ({
         inverted
         title={"Back"}
         onPress={() => {
-          navigate("/signup/1");
+          setCurrentSection(1);
         }}
       />
-      <Button onPress={() => {}} title={"Submit"} />
+      <Button
+        disabled={!valid[0] || !valid[1] || !valid[2]}
+        onPress={onSubmit}
+        title={"Submit"}
+      />
     </>
   );
 };

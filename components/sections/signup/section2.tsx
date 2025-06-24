@@ -1,13 +1,19 @@
+import { BASE_URL } from "@/app/utils/apiHost";
 import { Button } from "@/components/atoms/button/button";
 import { Label } from "@/components/atoms/label/label";
 import Select from "@/components/atoms/select/select";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { Control, Controller } from "react-hook-form";
-import { FormFields } from "./types";
-import axios from "axios";
-import { BASE_URL } from "@/app/utils/apiHost";
 import { StyledSlider } from "@/components/atoms/slider/slider";
+import { FormErrorHandler } from "@/components/handlers/error";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  UseFormGetFieldState,
+  UseFormTrigger,
+} from "react-hook-form";
+import { FormFields } from "./types";
 
 type section2Fields = {
   age: number;
@@ -18,8 +24,16 @@ type section2Fields = {
 
 const Section2 = ({
   control,
+  errors,
+  trigger,
+  setCurrentSection,
+  getFieldState,
 }: {
   control: Control<FormFields, any, FormFields>;
+  errors: FieldErrors<FormFields>;
+  trigger: UseFormTrigger<FormFields>;
+  setCurrentSection: React.Dispatch<React.SetStateAction<number>>;
+  getFieldState: UseFormGetFieldState<FormFields>;
 }) => {
   const [genderOpen, setGenderOpen] = useState(false);
   const [genderItems, setGenderItems] = useState([]);
@@ -29,6 +43,10 @@ const Section2 = ({
 
   const [occupationOpen, setOccupationOpen] = useState(false);
   const [occupationItems, setOccupationItems] = useState([]);
+
+  const [valid, setValid] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!genderOpen) return;
@@ -92,6 +110,39 @@ const Section2 = ({
       .finally();
   };
 
+  const getValidation = async (): Promise<boolean> => {
+    const validCreds = await trigger([
+      "age",
+      "gender",
+      "country",
+      "occupation",
+    ]);
+    if (!validCreds) {
+      setLoading(false);
+    }
+    setValid(validCreds);
+    return validCreds;
+  };
+
+  const onSubmit = async () => {
+    setLoading(true);
+    const validCreds = await getValidation();
+    if (!validCreds) {
+      if (errors?.age) {
+        FormErrorHandler("Age", errors?.age?.type);
+        setCurrentSection(2);
+      } else if (errors?.gender) {
+        FormErrorHandler("Gender", errors?.gender?.type);
+      } else if (errors?.country) {
+        FormErrorHandler("Country", errors?.country?.type);
+      } else if (errors?.occupation) {
+        FormErrorHandler("Occupation", errors?.occupation?.type);
+      }
+      return;
+    }
+    setCurrentSection(2);
+  };
+
   return (
     <>
       <Controller
@@ -102,8 +153,9 @@ const Section2 = ({
             <StyledSlider
               min={18}
               max={100}
-              onValueChange={(age) => {
+              onValueChange={async (age) => {
                 onChange(Math.floor(age));
+                await getValidation();
               }}
               style={{ height: 20 }}
               value={value}
@@ -122,7 +174,10 @@ const Section2 = ({
             dropDownDirection="TOP"
             open={genderOpen}
             setOpen={setGenderOpen}
-            setValue={onChange}
+            setValue={async (v) => {
+              onChange(v);
+              await getValidation();
+            }}
             value={value}
             items={genderItems}
           />
@@ -139,7 +194,10 @@ const Section2 = ({
             dropDownDirection="TOP"
             open={countryOpen}
             setOpen={setCountryOpen}
-            setValue={onChange}
+            setValue={async (v) => {
+              onChange(v);
+              await getValidation();
+            }}
             value={value}
             items={countryItems}
           />
@@ -156,18 +214,27 @@ const Section2 = ({
             dropDownDirection="TOP"
             open={occupationOpen}
             setOpen={setOccupationOpen}
-            setValue={onChange}
+            setValue={async (v) => {
+              onChange(v);
+              await getValidation();
+            }}
             value={value}
             items={occupationItems}
           />
         )}
         name="occupation"
       />
-      <Button inverted title={"Back"} onPress={() => {}} />
       <Button
+        inverted
+        title={"Back"}
         onPress={() => {
-          router.push("/signup/2");
+          setCurrentSection(0);
         }}
+      />
+      <Button
+        disabled={!valid}
+        loading={loading}
+        onPress={onSubmit}
         title={"Next"}
       />
     </>
