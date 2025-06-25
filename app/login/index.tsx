@@ -155,7 +155,7 @@ const Login = ()=>{
             onPress={handleSubmit(onSubmit, handleFormError)}
           />
           <View style={styles.assistContainer}>
-            <Link href={"/"} style={styles.forgotPassword}>
+            <Link href={"../forgotPassword/0"} style={styles.forgotPassword}>
               Forgot Password
             </Link>
             <Link href={"/signup/0"} style={styles.forgotPassword}>

@@ -16,6 +16,7 @@ import {
 } from "react-hook-form";
 import Toast from "react-native-toast-message";
 import { FormFields } from "./types";
+import { navigate } from "expo-router/build/global-state/routing";
 
 type section3Fields = {
   username: string;
@@ -39,7 +40,7 @@ const Section3 = ({
   getFieldValue: UseFormGetValues<FormFields>;
 }) => {
   const [valid, setValid] = useState([true, true, true]);
-
+  const [loading,setLoading] = useState(false);
   const getValidation = async (
     target?: "username" | "password" | "confirmPassword"
   ) => {
@@ -73,6 +74,7 @@ const Section3 = ({
   }, []);
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     const validSection = await getValidation();
     if (!validSection) {
       if (errors?.username) {
@@ -88,6 +90,7 @@ const Section3 = ({
       } else {
         FormErrorHandler();
       }
+      setLoading(false);
       return;
     }
 
@@ -95,6 +98,7 @@ const Section3 = ({
       .post(`${BASE_URL}/api/v1/user/register`, data)
       .then((res) => {
         Toast.show({ type: "success", text1: res.data.message });
+        navigate('../login');
       })
       .catch((error) => {
         if (error?.response?.data?.error) {
@@ -105,7 +109,7 @@ const Section3 = ({
         } else {
           SomethingWentWrong();
         }
-      });
+      }).finally(()=>{setLoading(false)});
   };
 
   return (
@@ -202,6 +206,7 @@ const Section3 = ({
         }}
       />
       <Button
+        loading={loading}
         disabled={!valid[0] || !valid[1] || !valid[2]}
         onPress={handleSubmit(onSubmit)}
         title={"Submit"}

@@ -1,7 +1,7 @@
 import { useTheme } from "@/theme/themeProvider";
 import { StyleSheet, Text, TextProps } from "react-native"
 
-const Note = (props:TextProps&{error?:boolean})=>{
+const Note = (props:TextProps&{error?:boolean,center?:boolean})=>{
 
     const {theme} =  useTheme();
 
@@ -12,11 +12,14 @@ const Note = (props:TextProps&{error?:boolean})=>{
         note:{
             color:theme?.colors.primary,
             fontSize:theme?.text.note.fontSize
+        },
+        center:{
+            textAlign:'center'
         }
     })
 
     return(
-        <Text style={{...styles.note, ...(props?.error && styles.error)}} {...props}/>
+        <Text style={{...styles.note, ...(props?.error && styles.error),...(props.center && styles.center)}} {...props}/>
     )
 }
 

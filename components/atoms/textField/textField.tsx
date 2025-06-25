@@ -19,7 +19,6 @@ const TextField = (props:(TextInputProps & {error?:boolean,errorNote?:boolean,no
       },
       noteBox: {
         flexDirection: "row",
-        justifyContent: "center",
         gap: theme?.gaps.info,
       },
     });
