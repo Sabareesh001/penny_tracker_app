@@ -15,7 +15,6 @@ import {
 import { StyleSheet } from "react-native";
 import { FormFields } from "./types";
 
-
 type section1Fields = {
   firstName: string;
   lastName: string;
@@ -23,13 +22,11 @@ type section1Fields = {
   phone: string;
 };
 
-
 const Section1 = ({
   control,
   errors,
   trigger,
   setCurrentSection,
-  getFieldState,
 }: {
   control: Control<FormFields, any, FormFields>;
   errors: FieldErrors<FormFields>;
@@ -38,7 +35,19 @@ const Section1 = ({
   getFieldState: UseFormGetFieldState<FormFields>;
 }) => {
   const [loading, setLoading] = useState(false);
-  const [valid, setValid] = useState([false, true]);
+
+  const [valid, setValid] = useState({
+    firstName: true,
+    lastName: true,
+    email: true,
+  });
+
+  const [touched, setTouched] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+  });
+
   const { theme } = useTheme();
 
   const styles = StyleSheet.create({
@@ -46,88 +55,94 @@ const Section1 = ({
       color: theme?.colors.text,
       textDecorationLine: "underline",
       textAlign: "center",
-      alignSelf:'center'
+      alignSelf: "center",
     },
   });
 
-  useEffect(()=>{
-      getValidation();
-  },[])
-
-  const getValidation = async (error?: boolean) => {
-    const validCreds = await trigger([
-      "firstName",
-      "lastName",
-      "email",
-    ]).finally(() => {
-      setLoading(false);
-    });
-    if (validCreds) {
-      setValid([true, true]);
-    } else {
-      setValid([false, error ? errors.email == null : true]);
-    }
-    return valid;
+  const validateField = async (field: keyof typeof valid) => {
+    const result = await trigger(field);
+    setValid((prev) => ({ ...prev, [field]: result }));
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async () => {
     setLoading(true);
-    const validate = await getValidation();
+    const isValid = await trigger(["firstName", "lastName", "email"]);
 
-    if (!validate) {
+    setValid({
+      firstName: errors.firstName == null,
+      lastName: errors.lastName == null,
+      email: errors.email == null,
+    });
+
+    if (!isValid) {
       if (errors.firstName) {
         FormErrorHandler("First Name", errors.firstName.type);
       } else if (errors.lastName) {
         FormErrorHandler("Last Name", errors.lastName.type);
       } else if (errors.email) {
         FormErrorHandler("Email", errors.email.type);
-        console.log(errors.email);
       }
+      setLoading(false);
       return;
     }
+
     setCurrentSection(1);
   };
 
   return (
     <>
-      <Label required>First Name</Label>
+      <Label error={!valid.firstName && touched.firstName} required>
+        First Name
+      </Label>
       <Controller
         control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, value } }) => (
-          <TextField
-            value={value}
-            onChangeText={async (v) => {
-              onChange(v);
-              await getValidation();
-            }}
-          />
-        )}
         name="firstName"
-      />
-      <Label required>Last Name</Label>
-      <Controller
-        control={control}
         rules={{
           required: true,
+          pattern: /^[A-Z]+$/gi,
         }}
         render={({ field: { onChange, value } }) => (
           <TextField
             value={value}
+            error={!valid.firstName && touched.firstName}
+            onFocus={() => setTouched((prev) => ({ ...prev, firstName: true }))}
             onChangeText={async (v) => {
-              onChange(v);
-              await getValidation();
+              onChange(v.trim());
+              await validateField("firstName");
             }}
           />
         )}
-        name="lastName"
       />
-      <Label error={!valid[1]} required>
+
+      <Label error={!valid.lastName && touched.lastName} required>
+        Last Name
+      </Label>
+      <Controller
+        control={control}
+        name="lastName"
+        rules={{
+          required: true,
+          pattern: /^[A-Z]+$/gi,
+        }}
+        render={({ field: { onChange, value } }) => (
+          <TextField
+            value={value}
+            error={!valid.lastName && touched.lastName}
+            onFocus={() => setTouched((prev) => ({ ...prev, lastName: true }))}
+            onChangeText={async (v) => {
+              onChange(v.trim());
+              await validateField("lastName");
+            }}
+          />
+        )}
+      />
+
+      <Label error={!valid.email && touched.email} required>
         Email
       </Label>
       <Controller
+        control={control}
+        name="email"
         rules={{
           required: true,
           pattern: {
@@ -136,36 +151,27 @@ const Section1 = ({
             message: "Email is Invalid",
           },
         }}
-        control={control}
         render={({ field: { onChange, value } }) => (
           <TextField
-            error={!valid[1]}
             value={value}
+            error={!valid.email && touched.email}
+            onFocus={() => setTouched((prev) => ({ ...prev, email: true }))}
             onChangeText={async (v) => {
-              onChange(v);
-              await getValidation(true);
+              onChange(v.trim());
+              await validateField("email");
             }}
           />
         )}
-        name="email"
       />
-      {/* <Label>
-                    Phone
-                </Label>
-                <Controller
-                control={control}
-                render={({field:{onChange,value}})=>(
-                    <TextField value={value} onChange={(e)=>{onChange(e.target)}}  />
-                )}
-                name="phone"
-                /> */}
+
       <Button
-        disabled={!valid[0]}
+        disabled={!valid.firstName || !valid.lastName || !valid.email}
         loading={loading}
         onPress={onSubmit}
-        title={"Next"}
+        title="Next"
       />
-      <Link href={"/login"} style={styles.oldUser}>
+
+      <Link href="/login" style={styles.oldUser}>
         Old User? Log In
       </Link>
     </>
@@ -179,11 +185,4 @@ const section1Defaults = {
   phone: "",
 };
 
-
-
-
-export {
-  Section1,
-  section1Defaults,
-  section1Fields
-};
+export { Section1, section1Defaults, section1Fields };

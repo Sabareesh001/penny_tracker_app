@@ -39,43 +39,42 @@ const Section3 = ({
   setCurrentSection: React.Dispatch<React.SetStateAction<number>>;
   getFieldValue: UseFormGetValues<FormFields>;
 }) => {
-  const [valid, setValid] = useState([true, true, true]);
-  const [loading,setLoading] = useState(false);
-  const getValidation = async (
-    target?: "username" | "password" | "confirmPassword"
-  ) => {
+  const [valid, setValid] = useState({
+    username: true,
+    password: true,
+    confirmPassword: true,
+  });
+
+  const [touched, setTouched] = useState({
+    username: false,
+    password: false,
+    confirmPassword: false,
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const getValidation = async (target?: keyof typeof valid) => {
     const validCred = await trigger([
       "username",
       "password",
       "confirmPassword",
     ]);
-    const targetIndices: Record<string, number> = {
-      username: 0,
-      password: 1,
-      confirmPassword: 2,
-    };
-    const updateError = (target: string, valid: boolean) => {
-      setValid((prev) => {
-        const newPrev = [...prev];
-        newPrev[targetIndices[target]] = valid;
-        return newPrev;
-      });
-    };
-    if (target) {
-      updateError(target, errors[target] == null);
-    } else {
-    }
+
+    setValid((prev) => ({
+      username: touched.username ? errors.username == null : prev.username,
+      password: touched.password ? errors.password == null : prev.password,
+      confirmPassword: touched.confirmPassword
+        ? errors.confirmPassword == null
+        : prev.confirmPassword,
+    }));
 
     return validCred;
   };
 
-  useEffect(() => {
-    getValidation();
-  }, []);
-
   const onSubmit = async (data: any) => {
     setLoading(true);
     const validSection = await getValidation();
+
     if (!validSection) {
       if (errors?.username) {
         FormErrorHandler("Username", errors.username.type);
@@ -98,7 +97,7 @@ const Section3 = ({
       .post(`${BASE_URL}/api/v1/user/register`, data)
       .then((res) => {
         Toast.show({ type: "success", text1: res.data.message });
-        navigate('../login');
+        navigate("../login");
       })
       .catch((error) => {
         if (error?.response?.data?.error) {
@@ -109,12 +108,15 @@ const Section3 = ({
         } else {
           SomethingWentWrong();
         }
-      }).finally(()=>{setLoading(false)});
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
     <>
-      <Label error={!valid[0]} required>
+      <Label error={!valid.username} required>
         Username
       </Label>
       <Controller
@@ -126,55 +128,56 @@ const Section3 = ({
           },
         }}
         control={control}
-        render={({ field: { value, onChange } }) => (
-          <>
-            <TextField
-              note="Username must start with alphabet and should not contain special characters"
-              errorNote={!valid[0]}
-              autoCapitalize="none"
-              error={!valid[0]}
-              onChangeText={async (e) => {
-                onChange(e.trim());
-                await getValidation("username");
-              }}
-              value={value}
-            />
-          </>
-        )}
         name="username"
+        render={({ field: { value, onChange } }) => (
+          <TextField
+            note="Username must start with alphabet and should not contain special characters"
+            errorNote={!valid.username}
+            autoCapitalize="none"
+            error={!valid.username}
+            onFocus={() => setTouched((prev) => ({ ...prev, username: true }))}
+            onChangeText={async (e) => {
+              onChange(e.trim());
+              if (touched.username) {
+                await getValidation("username");
+              }
+            }}
+            value={value}
+          />
+        )}
       />
-      <Label error={!valid[1]} required>
+
+      <Label error={!valid.password} required>
         Password
       </Label>
       <Controller
         rules={{
-          required: {
-            value: true,
-            message: "",
-          },
+          required: { value: true, message: "" },
           pattern: {
-            value: /^\S*$/gi,
+            value: /^\S{14,}$/gi,
             message: "",
           },
         }}
         control={control}
-        render={({ field: { value, onChange } }) => (
-          <>
-            <TextField
-              note="Password must not contain spaces"
-              error={!valid[1]}
-              secureTextEntry
-              onChangeText={async (e) => {
-                onChange(e);
-                await getValidation("password");
-              }}
-              value={value}
-            />
-          </>
-        )}
         name="password"
+        render={({ field: { value, onChange } }) => (
+          <TextField
+            note="Password must not contain spaces and be at least 14 characters long"
+            error={!valid.password}
+            secureTextEntry
+            onFocus={() => setTouched((prev) => ({ ...prev, password: true }))}
+            onChangeText={async (e) => {
+              onChange(e.trim());
+              if (touched.password) {
+                await getValidation("password");
+              }
+            }}
+            value={value}
+          />
+        )}
       />
-      <Label error={!valid[2]} required>
+
+      <Label error={!valid.confirmPassword} required>
         Confirm Password
       </Label>
       <Controller
@@ -183,21 +186,25 @@ const Section3 = ({
           validate: (v) => v === getFieldValue("password"),
         }}
         control={control}
-        render={({ field: { value, onChange } }) => (
-          <>
-            <TextField
-              error={!valid[2]}
-              secureTextEntry
-              onChangeText={async (e) => {
-                onChange(e);
-                await getValidation("confirmPassword");
-              }}
-              value={value}
-            />
-          </>
-        )}
         name="confirmPassword"
+        render={({ field: { value, onChange } }) => (
+          <TextField
+            error={!valid.confirmPassword}
+            secureTextEntry
+            onFocus={() =>
+              setTouched((prev) => ({ ...prev, confirmPassword: true }))
+            }
+            onChangeText={async (e) => {
+              onChange(e);
+              if (touched.confirmPassword) {
+                await getValidation("confirmPassword");
+              }
+            }}
+            value={value}
+          />
+        )}
       />
+
       <Button
         inverted
         title={"Back"}
@@ -207,7 +214,7 @@ const Section3 = ({
       />
       <Button
         loading={loading}
-        disabled={!valid[0] || !valid[1] || !valid[2]}
+        disabled={!valid.username || !valid.password || !valid.confirmPassword}
         onPress={handleSubmit(onSubmit)}
         title={"Submit"}
       />
