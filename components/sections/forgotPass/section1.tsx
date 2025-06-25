@@ -7,7 +7,7 @@ import { FormErrorHandler } from "@/components/handlers/error";
 import { SomethingWentWrong } from "@/components/toasts/toasts";
 import { useTheme } from "@/theme/themeProvider";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -21,7 +21,13 @@ const Section1 = ({
 }) => {
   const { theme } = useTheme();
 
-  const [valid, setValid] = useState(true);
+  const [valid, setValid] = useState({
+    email: true,
+  });
+
+  const [touched, setTouched] = useState({
+    email: false,
+  });
 
   const [loading, setLoading] = useState(false);
 
@@ -36,16 +42,15 @@ const Section1 = ({
     },
   });
 
-  useEffect(()=>{
-     trigger();
-  },[])
+  const getValidation = async () => {
+    const isValid = await trigger("email");
+    setValid((prev) => ({
+      email: touched.email ? errors.email == null : prev.email,
+    }));
+    return isValid;
+  };
 
-  const getValidation = async()=>{
-      const valid = await trigger();
-      setValid(valid);
-  }
-
-  const onSumbit = (data: any) => {
+  const onSubmit = (data: any) => {
     setLoading(true);
     axios
       .post(`${BASE_URL}/api/v1/user/forgot/password/email/requestOtp`, data)
@@ -58,7 +63,7 @@ const Section1 = ({
         setCurrentSection(1);
       })
       .catch((err) => {
-        if (err.response) {
+        if (err?.response?.data?.error) {
           Toast.show({
             type: "error",
             text1: err.response.data.error,
@@ -70,7 +75,6 @@ const Section1 = ({
       .finally(() => {
         setLoading(false);
       });
-    console.log(data);
   };
 
   const onFailure = () => {
@@ -87,7 +91,7 @@ const Section1 = ({
     <>
       <SectionHeading>Forgot Password</SectionHeading>
       <View style={styles.fieldBox}>
-        <Label error={!valid} required>
+        <Label error={!valid.email} required>
           Email
         </Label>
         <Controller
@@ -95,17 +99,28 @@ const Section1 = ({
           name="email"
           rules={{
             required: true,
-            pattern: /^\S+@([A-Z])+\.[A-Z]+$/gi,
+            pattern:
+              /^(?!.*\.\@)(?!\.)([a-zA-Z0-9_+-]+(?:\.[a-zA-Z0-9_+-]+)*)@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/,
           }}
           render={({ field: { onChange, value } }) => (
-            <TextField error={!valid} value={value} onChangeText={(v)=>{onChange(v);}} />
+            <TextField
+              error={!valid.email}
+              value={value}
+              onFocus={() => setTouched((prev) => ({ ...prev, email: true }))}
+              onChangeText={async (v) => {
+                onChange(v.trim());
+                if (touched.email) {
+                  await getValidation();
+                }
+              }}
+            />
           )}
         />
       </View>
       <Button
-        disabled={!valid}
+        disabled={!valid.email}
         loading={loading}
-        onPress={handleSubmit(onSumbit, onFailure)}
+        onPress={handleSubmit(onSubmit, onFailure)}
         title="Request OTP"
       />
     </>

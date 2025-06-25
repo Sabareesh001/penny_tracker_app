@@ -52,21 +52,21 @@ const Section2 = ({
     if (!genderOpen) return;
     setCountryOpen(false);
     setOccupationOpen(false);
-    if (genderItems.length) return;
+    if (genderItems.length!=0) return;
     fetchGenders();
   }, [genderOpen]);
   useEffect(() => {
     if (!countryOpen) return;
     setGenderOpen(false);
     setOccupationOpen(false);
-    if (countryItems.length) return;
+    if (countryItems.length!=0) return;
     fetchCountries();
   }, [countryOpen]);
   useEffect(() => {
     if (!occupationOpen) return;
     setGenderOpen(false);
     setCountryOpen(false);
-    if (occupationItems.length) return;
+    if (occupationItems.length!=0) return;
     fetchOccupations();
   }, [occupationOpen]);
 
@@ -120,9 +120,15 @@ const Section2 = ({
     if (!validCreds) {
       setLoading(false);
     }
+    else{
+      fetchCountries();
+      fetchGenders();
+      fetchOccupations();
+    }
     setValid(validCreds);
     return validCreds;
   };
+
 
   const onSubmit = async () => {
     setLoading(true);

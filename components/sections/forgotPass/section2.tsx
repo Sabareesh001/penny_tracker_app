@@ -52,6 +52,9 @@ const Section2 = ({
 
   useEffect(() => {
     setDisabled(otp.length !== 4);
+    if(otp.length==4){
+      onSumbit();
+    }
   }, [otp]);
 
   return (
@@ -60,7 +63,6 @@ const Section2 = ({
       <OtpInputStyled
         onTextChange={setOtp}
         numberOfDigits={4}
-        onFilled={onSumbit}
       />
       <Button
         loading={loading}
