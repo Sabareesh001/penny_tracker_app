@@ -11,6 +11,7 @@ import { Controller, useForm } from "react-hook-form"
 import { KeyboardAvoidingView, StyleSheet, View } from "react-native"
 import Toast from "react-native-toast-message"
 import { BASE_URL } from "../utils/apiHost"
+import * as SecureStore from "expo-secure-store";
 const Login = ()=>{
   
     const [valid,setValid] = useState(false);
@@ -33,6 +34,7 @@ const Login = ()=>{
               type:'success',
               text1:res.data.message
             })
+            SecureStore.setItem("authToken",res.data.token);
           }).catch((error)=>{
             if(!error.response){
               Toast.show({
