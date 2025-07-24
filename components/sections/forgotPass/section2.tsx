@@ -1,18 +1,17 @@
-import { BASE_URL } from "@/app/utils/apiHost";
 import { Button } from "@/components/atoms/button/button";
 import { Note } from "@/components/atoms/note/note";
 import { OtpInputStyled } from "@/components/atoms/otp/otp";
 import { SomethingWentWrong } from "@/components/toasts/toasts";
+import { BASE_URL } from "@/utils/apiHost";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Text } from "react-native"
 import Toast from "react-native-toast-message";
 const Section2 = ({
   email,
   setCurrentSection,
 }: {
-  email: string,
-  setCurrentSection:React.Dispatch<React.SetStateAction<number>>
+  email: string;
+  setCurrentSection: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
@@ -52,7 +51,7 @@ const Section2 = ({
 
   useEffect(() => {
     setDisabled(otp.length !== 4);
-    if(otp.length==4){
+    if (otp.length == 4) {
       onSumbit();
     }
   }, [otp]);
@@ -60,10 +59,7 @@ const Section2 = ({
   return (
     <>
       <Note center>{`Otp has been successfully sent to ${email}`}</Note>
-      <OtpInputStyled
-        onTextChange={setOtp}
-        numberOfDigits={4}
-      />
+      <OtpInputStyled onTextChange={setOtp} numberOfDigits={4} />
       <Button
         loading={loading}
         disabled={disabled}
@@ -75,4 +71,4 @@ const Section2 = ({
   );
 };
 
-export {Section2};
+export { Section2 };

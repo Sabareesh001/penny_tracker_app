@@ -1,9 +1,9 @@
-import { BASE_URL } from "@/app/utils/apiHost";
 import { Button } from "@/components/atoms/button/button";
 import { Label } from "@/components/atoms/label/label";
 import Select from "@/components/atoms/select/select";
 import { StyledSlider } from "@/components/atoms/slider/slider";
 import { FormErrorHandler } from "@/components/handlers/error";
+import { BASE_URL } from "@/utils/apiHost";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import {
@@ -52,21 +52,21 @@ const Section2 = ({
     if (!genderOpen) return;
     setCountryOpen(false);
     setOccupationOpen(false);
-    if (genderItems.length!=0) return;
+    if (genderItems.length != 0) return;
     fetchGenders();
   }, [genderOpen]);
   useEffect(() => {
     if (!countryOpen) return;
     setGenderOpen(false);
     setOccupationOpen(false);
-    if (countryItems.length!=0) return;
+    if (countryItems.length != 0) return;
     fetchCountries();
   }, [countryOpen]);
   useEffect(() => {
     if (!occupationOpen) return;
     setGenderOpen(false);
     setCountryOpen(false);
-    if (occupationItems.length!=0) return;
+    if (occupationItems.length != 0) return;
     fetchOccupations();
   }, [occupationOpen]);
 
@@ -119,8 +119,7 @@ const Section2 = ({
     ]);
     if (!validCreds) {
       setLoading(false);
-    }
-    else{
+    } else {
       fetchCountries();
       fetchGenders();
       fetchOccupations();
@@ -128,7 +127,6 @@ const Section2 = ({
     setValid(validCreds);
     return validCreds;
   };
-
 
   const onSubmit = async () => {
     setLoading(true);

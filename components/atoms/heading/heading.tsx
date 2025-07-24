@@ -1,8 +1,8 @@
 import { useTheme } from "@/theme/themeProvider"
 import { ReactNode } from "react"
-import { StyleSheet, Text } from "react-native"
+import { StyleSheet, Text, TextProps } from "react-native"
 
-const SectionHeading = ({children}:{children:ReactNode})=>{
+const SectionHeading = (props:TextProps)=>{
     const {theme} = useTheme()
     const styles = StyleSheet.create({
         section:{
@@ -12,11 +12,7 @@ const SectionHeading = ({children}:{children:ReactNode})=>{
             color:theme?.colors.text
         }
     }) 
-    return(
-        <Text style={styles.section}>
-            {children}
-        </Text>
-    )
+    return <Text {...props} style={[styles.section, props.style]}></Text>;
 }
 
 export {SectionHeading}

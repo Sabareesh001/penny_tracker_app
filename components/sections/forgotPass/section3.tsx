@@ -1,10 +1,10 @@
-import { BASE_URL } from "@/app/utils/apiHost";
 import { Button } from "@/components/atoms/button/button";
 import { SectionHeading } from "@/components/atoms/heading/heading";
 import { Label } from "@/components/atoms/label/label";
 import { TextField } from "@/components/atoms/textField/textField";
 import { FormErrorHandler } from "@/components/handlers/error";
 import { SomethingWentWrong } from "@/components/toasts/toasts";
+import { BASE_URL } from "@/utils/apiHost";
 import axios from "axios";
 import { navigate } from "expo-router/build/global-state/routing";
 import { useEffect, useState } from "react";
@@ -69,7 +69,7 @@ const Section3 = ({ email }: { email: string }) => {
             type: "success",
             text1: res.data.message,
           });
-          navigate('../login')
+          navigate("../login");
         } else {
           SomethingWentWrong();
         }
