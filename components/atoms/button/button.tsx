@@ -1,6 +1,7 @@
 import { useTheme } from "@/theme/themeProvider";
 import { GestureResponderEvent, Pressable, StyleSheet, Text, View } from "react-native";
 import { CircularProgress } from '@expo/ui/jetpack-compose';
+import { Loader } from "../loader/loader";
 const Button = ({loading,title,onPress,inverted,disabled}:{loading?:boolean,title:string,onPress:((event: GestureResponderEvent) => void),inverted?:boolean,disabled?:boolean})=>{
     const {theme} = useTheme()
     const styles = StyleSheet.create({
@@ -39,7 +40,7 @@ const Button = ({loading,title,onPress,inverted,disabled}:{loading?:boolean,titl
             {
                 loading?
                 (
-                    <CircularProgress progress={null} style={{ width: 28, height:28 }}  color={theme?.colors.secondary} elementColors={{ trackColor: 'transparent' }}/>
+                    <Loader/>
                 ):(
                     <Text style={{...styles.label,...(inverted && styles.labelInverted)}}>
                     {title}

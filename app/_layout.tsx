@@ -17,6 +17,9 @@ export default function RootLayout() {
       if(! await AsyncStorage.getItem("currency")){
         await AsyncStorage.setItem("currency", "USD-United States");
       }
+      if(! await AsyncStorage.getItem("weightMeasure")){
+        await AsyncStorage.setItem("weightMeasure", "gram");
+      }
     })()
   },[])
 

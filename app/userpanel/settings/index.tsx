@@ -24,16 +24,17 @@ export default function Settings() {
 
   const [settingsData, setSettingsData] = useState({
     currency: "",
+    weightMeasure:""
   });
 
-  const [openState, setOpenState] = useState({ currency: false });
+  const [openState, setOpenState] = useState({ currency: false ,weigthMeasure:false});
   const [currencyList, setCurrencyList] = useState<
     Array<{ label: string; value: string }>
   >([]);
-
+  const [weightMeasureList,setWeightMeasureList] = useState([{label:"Grams",value:"gram"},{label:"Ounces",value:"ounce"}])
   type CurrencyData = {
     currency: string;
-    flag: string;
+    unicodeFlag: string;
     iso2: string;
     iso3: string;
     name: string;
@@ -41,11 +42,13 @@ export default function Settings() {
 
   useEffect(() => {
     (async () => {
-      const savedCurrency = await AsyncStorage.getItem("currency");
+      const savedCurrency = await AsyncStorage.getItem("currency") || "";
+      const savedWeightMeasure = await AsyncStorage.getItem("weightMeasure") || "";
       if (savedCurrency) {
         setSettingsData((prev) => ({
           ...prev,
           currency: savedCurrency,
+          weightMeasure:savedWeightMeasure
         }));
       }
     })();
@@ -54,20 +57,20 @@ export default function Settings() {
 
   }, []);
 
-  useEffect(() => {
 
-    
-  }, []);
 
   const fetchCurrencyList = ()=>{
     axios
       .get(`${BASE_URL}/api/v1/currency`)
       .then((res) => {
         if (res.data?.data) {
-          const formattedList = res.data.data.map((value: CurrencyData) => ({
-            label: `${value.flag} ${value.currency} - ${value.name}`,
+          
+          const formattedList = res.data.data.map((value: CurrencyData) =>{
+          return({
+            label: `${value.unicodeFlag} ${value.currency} - ${value.name}`,
             value: `${value.currency}-${value.name}`,
-          }));
+          })});
+            
           setCurrencyList(formattedList);
         }
       })
@@ -80,29 +83,47 @@ export default function Settings() {
   return (
     <View style={styles.container}>
       <View style={styles.form}>
-      <Label>Currency</Label>
-      <Select
-        searchable
-        flatListProps={{
-          initialNumToRender: 5,
-          maxToRenderPerBatch: 5,
-          windowSize: 250,
-        }}
-        searchPlaceholder="Search by country or currency code"
-        listMode="FLATLIST"
-        value={settingsData.currency}
-        setValue={async (val) => {
-          setSettingsData((prev) => ({ ...prev, currency: val(prev) }));
-          await AsyncStorage.setItem("currency",val(null))
-          console.log(await AsyncStorage.getItem("currency"))
-        }}
-        items={currencyList}
-        setOpen={() =>
-          setOpenState((prev) => ({ ...prev, currency: !prev.currency }))
-        }
-        open={openState.currency}
-      />
-      </View>
+        <Label>Currency</Label>
+        <Select
+          dropDownDirection="TOP"
+          open={openState.weigthMeasure}
+          items={weightMeasureList}
+          setOpen={() => {
+            setOpenState((prev) => ({
+              ...prev,
+              weigthMeasure: !prev.weigthMeasure,
+            }));
+          }}
+          value={settingsData.weightMeasure}
+          setValue={async (val) => {
+            setSettingsData((prev) => ({ ...prev, weightMeasure: val(prev) }));
+            await AsyncStorage.setItem("weightMeasure", val(null));
+            console.log(await AsyncStorage.getItem("weightMeasure"));
+          }}
+        />
+        <Label>Currency</Label>
+          <Select
+            searchable
+            flatListProps={{
+              initialNumToRender: 5,
+              maxToRenderPerBatch: 5,
+              windowSize: 250,
+            }}
+            searchPlaceholder="Search by country or currency code"
+            listMode="FLATLIST"
+            value={settingsData.currency}
+            setValue={async (val) => {
+              setSettingsData((prev) => ({ ...prev, currency: val(prev) }));
+              await AsyncStorage.setItem("currency", val(null));
+              console.log(await AsyncStorage.getItem("currency"));
+            }}
+            items={currencyList}
+            setOpen={() =>
+              setOpenState((prev) => ({ ...prev, currency: !prev.currency }))
+            }
+            open={openState.currency}
+          />
+            </View>
     </View>
   );
 }
