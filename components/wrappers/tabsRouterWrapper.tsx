@@ -28,6 +28,7 @@ const StyledTabs = (props:StyledTabsProps) => {
         headerStyle: {
           backgroundColor: theme?.colors.secondary,
           borderColor: theme?.border.color,
+          borderBottomWidth:0.5,
           shadowColor:theme?.border.color
         },
         headerStatusBarHeight: 0,

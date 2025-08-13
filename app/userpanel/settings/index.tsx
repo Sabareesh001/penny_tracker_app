@@ -33,11 +33,11 @@ export default function Settings() {
   >([]);
   const [weightMeasureList,setWeightMeasureList] = useState([{label:"Grams",value:"gram"},{label:"Ounces",value:"ounce"}])
   type CurrencyData = {
-    currency: string;
-    unicodeFlag: string;
-    iso2: string;
-    iso3: string;
-    name: string;
+    Currency: string;
+    UnicodeFlag: string;
+    Iso2: string;
+    Iso3: string;
+    Name: string;
   };
 
   useEffect(() => {
@@ -64,11 +64,10 @@ export default function Settings() {
       .get(`${BASE_URL}/api/v1/currency`)
       .then((res) => {
         if (res.data?.data) {
-          
           const formattedList = res.data.data.map((value: CurrencyData) =>{
-          return({
-            label: `${value.unicodeFlag} ${value.currency} - ${value.name}`,
-            value: `${value.currency}-${value.name}`,
+            return({
+            label: `${value.UnicodeFlag} ${value.Currency} - ${value.Name}`,
+            value: `${value.Currency}-${value.Name}`,
           })});
             
           setCurrencyList(formattedList);
@@ -83,7 +82,7 @@ export default function Settings() {
   return (
     <View style={styles.container}>
       <View style={styles.form}>
-        <Label>Currency</Label>
+        <Label>Weight Measure</Label>
         <Select
           dropDownDirection="TOP"
           open={openState.weigthMeasure}

@@ -12,6 +12,7 @@ import {
   FieldErrors,
   UseFormGetFieldState,
   UseFormTrigger,
+  useFormState,
 } from "react-hook-form";
 import { FormFields } from "./types";
 
@@ -44,94 +45,77 @@ const Section2 = ({
   const [occupationOpen, setOccupationOpen] = useState(false);
   const [occupationItems, setOccupationItems] = useState([]);
 
-  const [valid, setValid] = useState(false);
-
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!genderOpen) return;
-    setCountryOpen(false);
-    setOccupationOpen(false);
-    if (genderItems.length != 0) return;
-    fetchGenders();
-  }, [genderOpen]);
-  useEffect(() => {
-    if (!countryOpen) return;
-    setGenderOpen(false);
-    setOccupationOpen(false);
-    if (countryItems.length != 0) return;
-    fetchCountries();
-  }, [countryOpen]);
-  useEffect(() => {
-    if (!occupationOpen) return;
-    setGenderOpen(false);
-    setCountryOpen(false);
-    if (occupationItems.length != 0) return;
-    fetchOccupations();
-  }, [occupationOpen]);
+  // Get isValid from react-hook-form instead of managing `valid` state
+  const { isValid } = useFormState({ control });
 
-  const fetchGenders = () => {
-    axios
-      .get(`${BASE_URL}/api/v1/gender?format=select`)
-      .then((res) => {
-        if (res.data?.data) {
-          setGenderItems(res.data.data);
-        }
-      })
-      .catch((res) => {
-        console.log(res);
-      })
-      .finally();
-  };
-  const fetchCountries = () => {
-    axios
-      .get(`${BASE_URL}/api/v1/country?format=select`)
-      .then((res) => {
-        if (res.data?.data) {
-          setCountryItems(res.data.data);
-        }
-      })
-      .catch((res) => {
-        console.log(res);
-      })
-      .finally();
-  };
-  const fetchOccupations = () => {
-    axios
-      .get(`${BASE_URL}/api/v1/occupation?format=select`)
-      .then((res) => {
-        if (res.data?.data) {
-          setOccupationItems(res.data.data);
-        }
-      })
-      .catch((res) => {
-        console.log(res);
-      })
-      .finally();
+  // Fetch functions
+  const fetchGenders = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/v1/gender?format=select`);
+      if (res.data?.data) setGenderItems(res.data.data);
+    } catch (err) {
+      FormErrorHandler("Gender list", "fetch_failed");
+    }
   };
 
-  const getValidation = async (): Promise<boolean> => {
-    const validCreds = await trigger([
-      "age",
-      "gender",
-      "country",
-      "occupation",
-    ]);
-    if (!validCreds) {
-      setLoading(false);
-    } else {
-      fetchCountries();
+  const fetchCountries = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/v1/country?format=select`);
+      if (res.data?.data) {
+        // Pre-map data
+        const mapped = res.data.data.map((data: any) => ({
+          label: `${data?.unicodeFlag} ${data?.name}`,
+          value: `${data?.iso3}-${data?.name}`,
+        }));
+        setCountryItems(mapped);
+      }
+    } catch (err) {
+      FormErrorHandler("Country list", "fetch_failed");
+    }
+  };
+
+  const fetchOccupations = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/v1/occupation?format=select`);
+      if (res.data?.data) setOccupationItems(res.data.data);
+    } catch (err) {
+      FormErrorHandler("Occupation list", "fetch_failed");
+    }
+  };
+
+  // Handle dropdown open events
+  useEffect(() => {
+    if (genderOpen && genderItems.length === 0) {
+      setCountryOpen(false);
+      setOccupationOpen(false);
       fetchGenders();
+    }
+  }, [genderOpen]);
+
+  useEffect(() => {
+    if (countryOpen && countryItems.length === 0) {
+      setGenderOpen(false);
+      setOccupationOpen(false);
+      fetchCountries();
+    }
+  }, [countryOpen]);
+
+  useEffect(() => {
+    if (occupationOpen && occupationItems.length === 0) {
+      setGenderOpen(false);
+      setCountryOpen(false);
       fetchOccupations();
     }
-    setValid(validCreds);
-    return validCreds;
-  };
+  }, [occupationOpen]);
 
   const onSubmit = async () => {
     setLoading(true);
-    const validCreds = await getValidation();
+    const validCreds = await trigger(["age", "gender", "country", "occupation"]);
+
     if (!validCreds) {
+      setLoading(false);
       if (errors?.age) {
         FormErrorHandler("Age", errors?.age?.type);
         setCurrentSection(2);
@@ -144,13 +128,17 @@ const Section2 = ({
       }
       return;
     }
+
     setCurrentSection(2);
+    setLoading(false);
   };
 
   return (
     <>
+      {/* Age Slider */}
       <Controller
         control={control}
+        name="age"
         render={({ field: { onChange, value } }) => (
           <>
             <Label required>Age - {value}</Label>
@@ -159,19 +147,21 @@ const Section2 = ({
               max={100}
               onValueChange={async (age) => {
                 onChange(Math.floor(age));
-                await getValidation();
+                await trigger("age");
               }}
               style={{ height: 20, width: "100%" }}
               value={value}
             />
           </>
         )}
-        name="age"
       />
+
+      {/* Gender */}
       <Label required>Gender</Label>
       <Controller
         rules={{ required: true }}
         control={control}
+        name="gender"
         render={({ field: { onChange, value } }) => (
           <Select
             placeholder="Select your gender"
@@ -180,21 +170,21 @@ const Section2 = ({
             setOpen={setGenderOpen}
             onChangeValue={async (v) => {
               onChange(v);
-              await getValidation();
+              await trigger("gender");
             }}
-            setValue={(v) => {
-              onChange(v);
-            }}
+            setValue={onChange}
             value={value}
             items={genderItems}
           />
         )}
-        name="gender"
       />
+
+      {/* Country */}
       <Label required>Country</Label>
       <Controller
-        control={control}
         rules={{ required: true }}
+        control={control}
+        name="country"
         render={({ field: { onChange, value } }) => (
           <Select
             placeholder="Select your country"
@@ -203,21 +193,24 @@ const Section2 = ({
             setOpen={setCountryOpen}
             onChangeValue={async (v) => {
               onChange(v);
-              await getValidation();
+              await trigger("country");
             }}
-            setValue={(v) => {
-              onChange(v);
-            }}
+            searchable
+            setValue={onChange}
+            listMode="FLATLIST"
+            flatListProps={{ maxToRenderPerBatch: 10, windowSize: 5 }}
             value={value}
             items={countryItems}
           />
         )}
-        name="country"
       />
+
+      {/* Occupation */}
       <Label required>Occupation</Label>
       <Controller
-        control={control}
         rules={{ required: true }}
+        control={control}
+        name="occupation"
         render={({ field: { onChange, value } }) => (
           <Select
             placeholder="Select your occupation"
@@ -226,26 +219,26 @@ const Section2 = ({
             setOpen={setOccupationOpen}
             onChangeValue={async (v) => {
               onChange(v);
-              await getValidation();
+              await trigger("occupation");
             }}
-            setValue={(v) => {
-              onChange(v);
-            }}
+            setValue={onChange}
             value={value}
             items={occupationItems}
           />
         )}
-        name="occupation"
       />
+
+      {/* Navigation Buttons */}
       <Button
         inverted
         title={"Back"}
         onPress={() => {
           setCurrentSection(0);
         }}
+        disabled={loading}
       />
       <Button
-        disabled={!valid}
+        disabled={!isValid}
         loading={loading}
         onPress={onSubmit}
         title={"Next"}

@@ -90,7 +90,7 @@ const TrackingCard = (props: TrackingCardProps) => {
           `${BASE_URL}/api/v1/currency/convert?from=USD&to=${currencyCode}`
         );
 
-        const rate = res.data?.data?.rate?.rate || 1;
+        const rate = res.data?.data?.rate || 1;
         setConvertedPrice(tracking.price * rate);
         setCurrencySymbol(getSymbolFromCurrency(currencyCode) || "$");
       } catch (err) {
