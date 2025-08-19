@@ -3,7 +3,7 @@ import { Animated, StyleSheet, View } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useTheme } from "@/theme/themeProvider";
 
-const LiveIcon = () => {
+const LiveIcon = ({size = 16}:{size?:number}) => {
   const { theme } = useTheme();
   const pulseAnim = useRef(new Animated.Value(0)).current;
 
@@ -16,10 +16,27 @@ const LiveIcon = () => {
               delay:800,
               useNativeDriver: true,
             }),
-      ])
-    ).start();
-  }, []);
-
+          ])
+        ).start();
+      }, []);
+      const styles = StyleSheet.create({
+        container: {
+          width: size,
+          height: size,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        pulse: {
+          position: "absolute",
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+        },
+        icon: {
+          zIndex: 1,
+        },
+      });
+      
   const color = theme?.colors.danger.danger;
 
   return (
@@ -39,7 +56,7 @@ const LiveIcon = () => {
       />
       <FontAwesome5
         name="dot-circle"
-        size={16}
+        size={size}
         color={color}
         style={styles.icon}
       />
@@ -47,22 +64,5 @@ const LiveIcon = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    width: 32,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  pulse: {
-    position: "absolute",
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-  },
-  icon: {
-    zIndex: 1,
-  },
-});
 
 export { LiveIcon };

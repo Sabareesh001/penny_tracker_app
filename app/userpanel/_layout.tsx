@@ -25,7 +25,7 @@ export default function UserPanelLayout(){
       <View style={styles.container}>
         <StyledTabs>
           <Tabs.Screen
-            name={"dashboard/index"}
+            name={"dashboard"}
             options={{
               tabBarLabel: "Dashboard",
               headerTitle: "Dashboard",

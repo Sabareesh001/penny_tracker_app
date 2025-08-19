@@ -1,18 +1,19 @@
-import { TrackingCard } from "@/components/trackingCard/trackingCard";
+import { TrackingCard } from "@/components/trackingCard";
 import { useTheme } from "@/theme/themeProvider";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { router, Stack } from "expo-router";
+import { navigate } from "expo-router/build/global-state/routing";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View, Dimensions } from "react-native";
+import { Dimensions, FlatList, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Dashboard() {
   const { theme } = useTheme();
   const weightMeasureStore = useAsyncStorage("weightMeasure");
   const [weightMeasure, setWeightMeasure] = useState("ounce");
-
   const screenWidth = Dimensions.get("window").width;
   const cardSpacing = theme?.gaps?.form || 16;
   const numColumns = 2;
-  const cardWidth = (screenWidth - cardSpacing * (numColumns+2)) / numColumns;
+  const cardWidth = (screenWidth - cardSpacing * (numColumns + 2)) / numColumns;
 
   const styles = StyleSheet.create({
     container: {
@@ -84,25 +85,38 @@ export default function Dashboard() {
   ];
 
   return (
-    <FlatList
-      data={sections}
-      keyExtractor={(section) => section.title}
-      renderItem={({ item: section }) => (
-        <View style={styles.container}>
-          <Text style={styles.sectionTitle}>{section.title}</Text>
-          <View style={styles.cardsContainer}>
-            {section.data.map((item) => (
-              <View key={item.metal} style={styles.cardWrapper}>
-                <TrackingCard
+    <>
+      <FlatList
+        data={sections}
+        keyExtractor={(section) => section.title}
+        renderItem={({ item: section }) => (
+          <View style={styles.container}>
+            <Text style={styles.sectionTitle}>{section.title}</Text>
+            <View style={styles.cardsContainer}>
+              {section.data.map((item) => {
+
+                const CurrentCard = ({isModal}:{isModal?:boolean}) => (<TrackingCard
                   imgUrl={item.imgUrl}
                   metal={item.metal}
                   unitMeasure={section.unitMeasure}
-                />
-              </View>
-            ))}
+                  isModal={isModal}
+                />)
+
+                return (
+                  <Pressable key={item.metal} onPress={()=>{router.push({pathname:"/userpanel/dashboard/trackingDetails",params:{imgUrl:item.imgUrl,metal:item.metal,unitMeasure:section.unitMeasure}})}}>
+                    <View key={item.metal} style={styles.cardWrapper}>
+                      {
+                        <CurrentCard  />
+                      }
+                    </View>
+                  </Pressable>
+                )
+              })}
+            </View>
           </View>
-        </View>
-      )}
-    />
+        )}
+
+      />
+    </>
   );
 }
