@@ -12,7 +12,7 @@ const TextField = (props:(TextInputProps & {error?:boolean,errorNote?:boolean,no
         borderRadius: theme?.border.radius,
         color: theme?.colors.input,
         fontSize: theme?.text.section.label.fontSize,
-        width: "100%",
+        flex:1
       },
       textInputError: {
         borderColor: theme?.colors.danger.danger,
@@ -30,6 +30,7 @@ const TextField = (props:(TextInputProps & {error?:boolean,errorNote?:boolean,no
             ...styles.textInput,
             ...(props?.error && styles.textInputError),
           }}
+          
         ></TextInput>
         {props.note && (
           <View style={styles.noteBox}>

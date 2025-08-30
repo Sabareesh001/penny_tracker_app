@@ -12,6 +12,13 @@ export default function Layout(){
         >
           <Stack.Screen name="userpanel/dashboard" />
           <Stack.Screen name="userpanel/dashboard/trackingDetails" />
+          <Stack.Screen options={{
+            presentation:'transparentModal',
+            animation:'fade',
+            contentStyle: {
+            backgroundColor: "transparent",  // only for this modal
+          },
+          }} name="userpanel/dashboard/addTracking" />
         </Stack>
     )
 }

@@ -1,8 +1,9 @@
 import { useTheme } from "@/theme/themeProvider"
+import ThemedCard,{CardProps} from "@rneui/themed/dist/Card";
 import { StyleSheet, View, ViewProps } from "react-native"
 
 
-const Card = (props:ViewProps)=>{
+const Card = (props:CardProps & {children:React.ReactNode})=>{
 
     const {theme} = useTheme();
 
@@ -12,14 +13,15 @@ const Card = (props:ViewProps)=>{
            borderColor: theme?.border.color,
            borderWidth:theme?.border.borderWidth,
            borderRadius:theme?.border.radius,
-           backgroundColor:theme?.colors.primary
+           backgroundColor:theme?.colors.primary,
+           width:'100%'
         }
     })
     
     return(
-        <View  {...props} style={[styles.cardContainer,props.style]}>
+        <ThemedCard  {...props} containerStyle={[styles.cardContainer,props.containerStyle]}>
             
-        </View>
+        </ThemedCard>
     )
 }
 

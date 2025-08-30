@@ -2,11 +2,11 @@ import { useTheme } from "@/theme/themeProvider";
 import { GestureResponderEvent, Pressable, StyleSheet, Text, View } from "react-native";
 import { CircularProgress } from '@expo/ui/jetpack-compose';
 import { Loader } from "../loader/loader";
-const Button = ({loading,title,onPress,inverted,disabled}:{loading?:boolean,title:string,onPress:((event: GestureResponderEvent) => void),inverted?:boolean,disabled?:boolean})=>{
+const Button = ({loading,title,onPress,inverted,disabled,icon}:{loading?:boolean,title:string,onPress:((event: GestureResponderEvent) => void),inverted?:boolean,disabled?:boolean,icon?:React.ReactNode})=>{
     const {theme} = useTheme()
     const styles = StyleSheet.create({
         button:{
-            width:'100%',
+            flex:1,
             alignItems:'center',
             justifyContent:'center',
             borderWidth:theme?.border.borderWidth,
@@ -23,7 +23,7 @@ const Button = ({loading,title,onPress,inverted,disabled}:{loading?:boolean,titl
             backgroundColor:theme?.colors.secondary,
         },
         content:{
-            height:30,
+          
         },
         label:{
             color:theme?.colors.secondary,
@@ -32,6 +32,12 @@ const Button = ({loading,title,onPress,inverted,disabled}:{loading?:boolean,titl
         ,
         labelInverted : {
             color:theme?.colors.primary
+        },
+        buttonContent:{
+            flexDirection:'row',
+            alignItems:'center',
+            justifyContent:'space-around',
+            gap:theme?.gaps.info
         }
     })
     return(
@@ -42,9 +48,12 @@ const Button = ({loading,title,onPress,inverted,disabled}:{loading?:boolean,titl
                 (
                     <Loader/>
                 ):(
+                    <View style={styles.buttonContent}>
+                    {icon}
                     <Text style={{...styles.label,...(inverted && styles.labelInverted)}}>
                     {title}
                     </Text>
+                    </View>
                 )
             }
             </View>

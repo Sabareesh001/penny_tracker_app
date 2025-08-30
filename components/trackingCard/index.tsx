@@ -19,7 +19,9 @@ type TrackingCardProps = {
   metal: string;
   imgUrl: string;
   unitMeasure: string; // "gram" or "ounce"
-  isModal ?: boolean
+  isModal ?: boolean;
+  height?:number;
+  setHolding?: React.Dispatch<React.SetStateAction<number>>
 };
 
 const TrackingCard = (props: TrackingCardProps) => {
@@ -101,8 +103,11 @@ const TrackingCard = (props: TrackingCardProps) => {
         console.error("Currency conversion error:", err);
       }
     })();
-  }, [tracking.price,currencyStore]);
+  }, [tracking.price]);
 
+  useEffect(()=>{
+     if(props.setHolding != null) props.setHolding(tracking.holdings);
+  },[tracking.holdings])
 
   const content = `${currencySymbol}${convertedPrice.toFixed(2)}/${props.unitMeasure}`;
 const displayText = props.isModal ? content : ClampText(content);
@@ -112,7 +117,10 @@ const displayText = props.isModal ? content : ClampText(content);
   const styles = StyleSheet.create({
     cardContainer: {
       gap: theme?.gaps.form,
-    },
+      margin:0,
+      display:'flex',
+      height:props.height || 'auto',
+          },
     infoContainer: {
     },
     iconsContainer: {
@@ -155,7 +163,8 @@ const displayText = props.isModal ? content : ClampText(content);
   });
 
   return (
-    <Card style={styles.cardContainer}>
+    <Card >
+      <View style={styles.cardContainer}>
       <View style={styles.topIconContainer}>
         <Image
           source={{ uri: props.imgUrl }}
@@ -225,6 +234,7 @@ const displayText = props.isModal ? content : ClampText(content);
             <Loader />
           </View>
         )}
+      </View>
       </View>
     </Card>
   );

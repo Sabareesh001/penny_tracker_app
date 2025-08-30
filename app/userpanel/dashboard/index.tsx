@@ -1,15 +1,37 @@
+import { SectionHeading } from "@/components/atoms/heading/heading";
+import { FloatingActionButton } from "@/components/floatingActionButton";
 import { TrackingCard } from "@/components/trackingCard";
 import { useTheme } from "@/theme/themeProvider";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { router, Stack } from "expo-router";
-import { navigate } from "expo-router/build/global-state/routing";
+import { router } from "expo-router";
+import axios from "axios";
 import { useEffect, useState } from "react";
-import { Dimensions, FlatList, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { BASE_URL } from "@/utils/apiHost";
+
+
+export type ResourceData = {
+  Id: number;
+  Name: string;
+  Image: string;
+  Symbol: string;
+  Status: string;
+};
+
+type ApiResponse<T> = {
+  message: string;
+  data: T[];
+};
 
 export default function Dashboard() {
   const { theme } = useTheme();
   const weightMeasureStore = useAsyncStorage("weightMeasure");
   const [weightMeasure, setWeightMeasure] = useState("ounce");
+  const [metals, setMetals] = useState<ResourceData[]>([]);
+  const [coins, setCoins] = useState<ResourceData[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const screenWidth = Dimensions.get("window").width;
   const cardSpacing = theme?.gaps?.form || 16;
   const numColumns = 2;
@@ -22,20 +44,22 @@ export default function Dashboard() {
     sectionTitle: {
       fontSize: 18,
       fontWeight: "bold",
-      marginTop: 16,
-      marginBottom: 8,
       color: theme?.colors?.text,
     },
     cardWrapper: {
       width: cardWidth,
-      margin: cardSpacing / 3,
     },
     cardsContainer: {
       flexDirection: "row",
       flexWrap: "wrap",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      paddingTop: 20,
+      gap: theme?.gaps.form,
     },
   });
 
+  // Load saved weight measure
   useEffect(() => {
     (async () => {
       const savedMeasure = await weightMeasureStore.getItem();
@@ -43,46 +67,55 @@ export default function Dashboard() {
     })();
   }, [weightMeasureStore]);
 
+  // Fetch metals and coins from backend
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const [metalsRes, coinsRes] = await Promise.all([
+          axios.get<ApiResponse<ResourceData>>(`${BASE_URL}/api/v1/metal`),
+          axios.get<ApiResponse<ResourceData>>(`${BASE_URL}/api/v1/coin`),
+        ]);
+
+        setMetals(metalsRes.data.data);
+        setCoins(coinsRes.data.data);
+      } catch (err) {
+        console.error("Error fetching resources:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResources();
+  }, []);
+
   const sections = [
     {
       title: "Metals",
       unitMeasure: weightMeasure,
-      data: [
-        {
-          imgUrl: "https://img.icons8.com/?size=1024&id=60373&format=png",
-          metal: "XAU",
-        },
-        {
-          imgUrl: "https://img.icons8.com/?size=1024&id=60376&format=png",
-          metal: "XAG",
-        },
-        {
-          imgUrl: "https://img.icons8.com/?size=1024&id=60378&format=png",
-          metal: "XPD",
-        },
-        {
-          imgUrl:
-            "https://img.icons8.com/?size=1024&id=sC04ZKtFcvpm&format=png",
-          metal: "HG",
-        },
-      ],
+      data: metals.map((m) =>{
+        if(m.Status==="0") return null;
+        return({
+        imgUrl: m.Image,
+        metal: m.Symbol,
+      })
+      } 
+    ).filter(Boolean),
     },
     {
       title: "Coins",
       unitMeasure: "coin",
-      data: [
-        {
-          imgUrl: "https://img.icons8.com/?size=1024&id=63192&format=png",
-          metal: "BTC",
-        },
-        {
-          imgUrl:
-            "https://img.icons8.com/?size=1024&id=NU48HGBGk0Do&format=png",
-          metal: "ETH",
-        },
-      ],
+      data: coins.map((m) =>{
+        if(m.Status==="0") return null;
+        return({
+        imgUrl: m.Image,
+        metal: m.Symbol,
+      })
+      } 
+    ).filter(Boolean),
     },
   ];
+
+  if (loading) return <Text style={{ padding: 20 }}>Loading...</Text>;
 
   return (
     <>
@@ -90,32 +123,54 @@ export default function Dashboard() {
         data={sections}
         keyExtractor={(section) => section.title}
         renderItem={({ item: section }) => (
+          section.data.length>0 &&
           <View style={styles.container}>
             <Text style={styles.sectionTitle}>{section.title}</Text>
             <View style={styles.cardsContainer}>
               {section.data.map((item) => {
-
-                const CurrentCard = ({isModal}:{isModal?:boolean}) => (<TrackingCard
-                  imgUrl={item.imgUrl}
-                  metal={item.metal}
-                  unitMeasure={section.unitMeasure}
-                  isModal={isModal}
-                />)
+                const CurrentCard = ({ isModal }: { isModal?: boolean }) => (
+                  <TrackingCard
+                    height={200}
+                    imgUrl={item.imgUrl}
+                    metal={item.metal}
+                    unitMeasure={section.unitMeasure}
+                    isModal={isModal}
+                  />
+                );
 
                 return (
-                  <Pressable key={item.metal} onPress={()=>{router.push({pathname:"/userpanel/dashboard/trackingDetails",params:{imgUrl:item.imgUrl,metal:item.metal,unitMeasure:section.unitMeasure}})}}>
-                    <View key={item.metal} style={styles.cardWrapper}>
-                      {
-                        <CurrentCard  />
-                      }
+                  <Pressable
+                    key={item.metal}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/userpanel/dashboard/trackingDetails",
+                        params: {
+                          imgUrl: item.imgUrl,
+                          metal: item.metal,
+                          unitMeasure: section.unitMeasure,
+                        },
+                      })
+                    }
+                  >
+                    <View style={styles.cardWrapper}>
+                      <CurrentCard />
                     </View>
                   </Pressable>
-                )
+                );
               })}
             </View>
           </View>
         )}
-
+      />
+      <FloatingActionButton
+        onPress={() => {
+          router.push({ pathname: "/userpanel/dashboard/addTracking" });
+        }}
+        placement="right"
+        size="large"
+        icon={
+          <Ionicons name="pencil" size={24} color={theme?.colors.primary} />
+        }
       />
     </>
   );

@@ -9,7 +9,7 @@ const SectionHeading = (props:TextProps)=>{
             textAlign:'center',
             fontSize:theme?.text.section.heading.fontSize,
             fontWeight:900,
-            color:theme?.colors.text
+            color:theme?.colors.text,
         }
     }) 
     return <Text {...props} style={[styles.section, props.style]}></Text>;
