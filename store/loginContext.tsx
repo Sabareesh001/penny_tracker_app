@@ -1,3 +1,5 @@
+import { Redirect } from "expo-router";
+import { navigate } from "expo-router/build/global-state/routing";
 import * as SecureStore from "expo-secure-store";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -12,6 +14,7 @@ const LoginContextProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setLoggedIn(SecureStore.getItem("authToken") != null);
   }, []);
+
 
 
 

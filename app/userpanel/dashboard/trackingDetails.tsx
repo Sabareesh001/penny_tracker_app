@@ -35,11 +35,11 @@ export default function TrackingDetails() {
             height: "100%",
             padding: theme?.paddings.page,
             backgroundColor: theme?.colors.secondary,
-            gap: theme?.gaps.form
+            gap: theme?.gaps.form,
         },
         optionsContainer: {
             flexDirection: 'row',
-            justifyContent: "space-between",
+            justifyContent:'space-between',
             alignItems: 'center',
             gap: theme?.gaps.form
         },
@@ -105,15 +105,15 @@ export default function TrackingDetails() {
                 setHolding={setHolding}
             />
             <View style={styles.optionsContainer}>
-                <Pressable onPressOut={() => { handlePressOut(decrementRef) }} onLongPress={handleDecrementLongPress} onPress={handleDecrementPress}>
+                <Pressable  onPressOut={() => { handlePressOut(decrementRef) }} onLongPress={handleDecrementLongPress} onPress={handleDecrementPress}>
                     <View style={styles.optionContainer}>
                         <AntDesign size={24} color={theme?.colors.danger.danger} name="minus" />
                     </View>
                 </Pressable>
-                <TextField  inputMode="numeric" onPress={()=>{setEditingWeight(true)}} onChangeText={(e)=>{if(!Number.isNaN(Number(e))) setModifiedHolding(Number(e));}} onSubmitEditing={()=>setEditingWeight(false)} keyboardType="number-pad" style={styles.resourceManagement} >
+                <TextField  width={200} inputMode="numeric" onPress={()=>{setEditingWeight(true)}} onChangeText={(e)=>{if(!Number.isNaN(Number(e))) setModifiedHolding(Number(e));}} onSubmitEditing={()=>setEditingWeight(false)} keyboardType="number-pad" style={styles.resourceManagement} >
                 {`${editingWeight?modifiedHolding:modifiedHolding.toFixed(2)}`+`${editingWeight?"":" "+unitMeasure+"s"}`}
                 </TextField>
-                <Pressable onPressOut={() => { handlePressOut(incrementRef) }} onLongPress={handleIncrementLongPress} onPress={handleIncrementPress}>
+                <Pressable  onPressOut={() => { handlePressOut(incrementRef) }} onLongPress={handleIncrementLongPress} onPress={handleIncrementPress}>
                     <View style={styles.optionContainer}>
                         <AntDesign size={24} color={theme?.colors.success.success} name="plus" />
                     </View>

@@ -55,7 +55,8 @@ type Theme = {
             fontSize : number,
             padding:number
         }
-    }
+    },
+    
 }
 
 

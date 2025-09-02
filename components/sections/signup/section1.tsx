@@ -14,6 +14,7 @@ import {
 } from "react-hook-form";
 import { StyleSheet } from "react-native";
 import { FormFields } from "./types";
+import { View } from "react-native";
 
 type section1Fields = {
   firstName: string;
@@ -57,6 +58,10 @@ const Section1 = ({
       textAlign: "center",
       alignSelf: "center",
     },
+    container:{
+      width:'100%',
+      gap:theme?.gaps.form
+    }
   });
 
   const validateField = async (field: keyof typeof valid) => {
@@ -90,7 +95,7 @@ const Section1 = ({
   };
 
   return (
-    <>
+    <View style={styles.container}>
       <Label error={!valid.firstName && touched.firstName} required>
         First Name
       </Label>
@@ -174,7 +179,7 @@ const Section1 = ({
       <Link href="/login" style={styles.oldUser}>
         Old User? Log In
       </Link>
-    </>
+    </View>
   );
 };
 

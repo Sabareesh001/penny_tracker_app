@@ -2,7 +2,10 @@ import { useTheme } from "@/theme/themeProvider";
 import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
 import { Note } from "../note/note";
 
-const TextField = (props:(TextInputProps & {error?:boolean,errorNote?:boolean,note?:string}))=>{
+export type TextFieldProps = {error?:boolean,errorNote?:boolean,note?:string,height?:number,width?:number} & TextInputProps
+
+
+const TextField = (props:TextFieldProps)=>{
     const {theme} = useTheme()
     const styles = StyleSheet.create({
       textInput: {
@@ -12,7 +15,11 @@ const TextField = (props:(TextInputProps & {error?:boolean,errorNote?:boolean,no
         borderRadius: theme?.border.radius,
         color: theme?.colors.input,
         fontSize: theme?.text.section.label.fontSize,
-        flex:1
+        flex:1,
+      },
+      container:{
+        height:props.height || 50,
+
       },
       textInputError: {
         borderColor: theme?.colors.danger.danger,
@@ -23,22 +30,25 @@ const TextField = (props:(TextInputProps & {error?:boolean,errorNote?:boolean,no
       },
     });
     return (
-      <>
-        <TextInput
-          {...props}
-          style={{
-            ...styles.textInput,
-            ...(props?.error && styles.textInputError),
-          }}
-          
-        ></TextInput>
-        {props.note && (
-          <View style={styles.noteBox}>
-            <Note error={props.errorNote}>{`ⓘ`}</Note>
-            <Note error={props.errorNote}>{props?.note}</Note>
-          </View>
-        )}
-      </>
+      <View>
+        <View style={styles.container}>
+          <TextInput
+            {...props}
+            
+            style={[{
+              ...styles.textInput,
+              ...(props?.error && styles.textInputError),
+            } ,props?.style]}
+            
+          ></TextInput>
+              </View>
+          {props.note && (
+            <View style={styles.noteBox}>
+              <Note error={props.errorNote}>{`ⓘ`}</Note>
+              <Note error={props.errorNote}>{props?.note}</Note>
+            </View>
+          )}
+      </View>
     );
 }
 

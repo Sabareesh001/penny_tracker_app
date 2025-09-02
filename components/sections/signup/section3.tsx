@@ -17,6 +17,9 @@ import {
 } from "react-hook-form";
 import Toast from "react-native-toast-message";
 import { FormFields } from "./types";
+import { useTheme } from "@/theme/themeProvider";
+import { StyleSheet } from "react-native";
+import { View } from "react-native";
 
 type section3Fields = {
   username: string;
@@ -114,8 +117,17 @@ const Section3 = ({
       });
   };
 
+  const {theme} = useTheme();
+
+  const styles = StyleSheet.create({
+     container:{
+      width:'100%',
+      gap:theme?.gaps.form
+    }
+  })
+
   return (
-    <>
+    <View style={styles.container}>
       <Label error={!valid.username} required>
         Username
       </Label>
@@ -218,7 +230,7 @@ const Section3 = ({
         onPress={handleSubmit(onSubmit)}
         title={"Submit"}
       />
-    </>
+    </View>
   );
 };
 

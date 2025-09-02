@@ -1,8 +1,8 @@
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { Pressable, PressableProps, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import { Card } from "../atoms/card/card";
 import { CheckBox } from "@rneui/themed";
 
-const CheckedContainer = (props:{children:React.ReactNode,checked:boolean})=>{
+const CheckedContainer = (props:{children:React.ReactNode,checked:boolean} & PressableProps)=>{
     const styles = StyleSheet.create({
         container:{
             position:'relative'
@@ -15,12 +15,14 @@ const CheckedContainer = (props:{children:React.ReactNode,checked:boolean})=>{
         }
     })
         return(
+            <Pressable onPress={props.onPress}>
             <View style={styles.container} >
             <Card children={props.children} >
                 
             </Card>
-            <CheckBox containerStyle={styles.checkbox} checked={props.checked} />
+            <CheckBox onPress={props.onPress} containerStyle={styles.checkbox} checked={props.checked} />
             </View>
+            </Pressable>
         )
 }
 

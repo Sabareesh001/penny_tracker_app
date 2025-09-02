@@ -4,24 +4,45 @@ import { TrackingCard } from "@/components/trackingCard";
 import { useTheme } from "@/theme/themeProvider";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { BASE_URL } from "@/utils/apiHost";
+import { Loader } from "@/components/atoms/loader/loader";
 
-
+// ----------------------
+// Exported Types
+// ----------------------
 export type ResourceData = {
   Id: number;
   Name: string;
   Image: string;
   Symbol: string;
-  Status: string;
+  Status: string; // "0" means inactive, "1" means active
 };
 
-type ApiResponse<T> = {
+export type ApiResponse<T> = {
   message: string;
   data: T[];
+};
+
+export type CardItem = {
+  imgUrl: string;
+  metal: string;
+};
+
+export type SectionData = {
+  title: string;
+  unitMeasure: string;
+  data: CardItem[];
 };
 
 export default function Dashboard() {
@@ -57,6 +78,11 @@ export default function Dashboard() {
       paddingTop: 20,
       gap: theme?.gaps.form,
     },
+    loaderView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
   });
 
   // Load saved weight measure
@@ -68,7 +94,8 @@ export default function Dashboard() {
   }, [weightMeasureStore]);
 
   // Fetch metals and coins from backend
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     const fetchResources = async () => {
       try {
         const [metalsRes, coinsRes] = await Promise.all([
@@ -86,81 +113,91 @@ export default function Dashboard() {
     };
 
     fetchResources();
-  }, []);
+  }, [])
+);
 
-  const sections = [
+  // Build sections
+  const sections: SectionData[] = [
     {
       title: "Metals",
       unitMeasure: weightMeasure,
-      data: metals.map((m) =>{
-        if(m.Status==="0") return null;
-        return({
-        imgUrl: m.Image,
-        metal: m.Symbol,
-      })
-      } 
-    ).filter(Boolean),
+      data: metals
+        .map((m) => {
+          if (m.Status === "0") return null;
+          return {
+            imgUrl: m.Image,
+            metal: m.Symbol,
+          };
+        })
+        .filter((x): x is CardItem => Boolean(x)),
     },
     {
       title: "Coins",
       unitMeasure: "coin",
-      data: coins.map((m) =>{
-        if(m.Status==="0") return null;
-        return({
-        imgUrl: m.Image,
-        metal: m.Symbol,
-      })
-      } 
-    ).filter(Boolean),
+      data: coins
+        .map((m) => {
+          if (m.Status === "0") return null;
+          return {
+            imgUrl: m.Image,
+            metal: m.Symbol,
+          };
+        })
+        .filter((x): x is CardItem => Boolean(x)),
     },
   ];
 
-  if (loading) return <Text style={{ padding: 20 }}>Loading...</Text>;
+  if (loading)
+    return (
+      <View style={styles.loaderView}>
+        <Loader color={theme?.colors.primary} />
+      </View>
+    );
 
   return (
     <>
       <FlatList
         data={sections}
         keyExtractor={(section) => section.title}
-        renderItem={({ item: section }) => (
-          section.data.length>0 &&
-          <View style={styles.container}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={styles.cardsContainer}>
-              {section.data.map((item) => {
-                const CurrentCard = ({ isModal }: { isModal?: boolean }) => (
-                  <TrackingCard
-                    height={200}
-                    imgUrl={item.imgUrl}
-                    metal={item.metal}
-                    unitMeasure={section.unitMeasure}
-                    isModal={isModal}
-                  />
-                );
+        renderItem={({ item: section }) =>
+  section.data.length > 0 ? (
+    <View style={styles.container}>
+      <Text style={styles.sectionTitle}>{section.title}</Text>
+      <View style={styles.cardsContainer}>
+        {section.data.map((item) => {
+          const CurrentCard = ({ isModal }: { isModal?: boolean }) => (
+            <TrackingCard
+              height={200}
+              imgUrl={item.imgUrl}
+              metal={item.metal}
+              unitMeasure={section.unitMeasure}
+              isModal={isModal}
+            />
+          );
 
-                return (
-                  <Pressable
-                    key={item.metal}
-                    onPress={() =>
-                      router.push({
-                        pathname: "/userpanel/dashboard/trackingDetails",
-                        params: {
-                          imgUrl: item.imgUrl,
-                          metal: item.metal,
-                          unitMeasure: section.unitMeasure,
-                        },
-                      })
-                    }
-                  >
-                    <View style={styles.cardWrapper}>
-                      <CurrentCard />
-                    </View>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-        )}
+          return (
+            <Pressable
+              key={item.metal}
+              onPress={() =>
+                router.push({
+                  pathname: "/userpanel/dashboard/trackingDetails",
+                  params: {
+                    imgUrl: item.imgUrl,
+                    metal: item.metal,
+                    unitMeasure: section.unitMeasure,
+                  },
+                })
+              }
+            >
+              <View style={styles.cardWrapper}>
+                <CurrentCard />
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  ) : null
+}
       />
       <FloatingActionButton
         onPress={() => {

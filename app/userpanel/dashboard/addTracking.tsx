@@ -1,6 +1,7 @@
 import { Card } from "@/components/atoms/card/card";
 import { SectionHeading } from "@/components/atoms/heading/heading";
 import { Loader } from "@/components/atoms/loader/loader";
+import { ToastStyled } from "@/components/atoms/toast/toast";
 import { CheckedContainer } from "@/components/checkedContainer";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
@@ -8,6 +9,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text } from "react-native";
 import { Image, View } from "react-native"
+import Toast from "react-native-toast-message";
 
 export interface TrackingItem {
     Id: number;
@@ -68,6 +70,24 @@ const AddTracking = ()=>{
             }
        })
 
+       const changeTrackingStatus = ({type,status,id}:{type:"metal" | "coin",status:"add" | "remove",id:Number})=>{
+        console.log(id)
+            axios.post(`${BASE_URL}/api/v1/${type}/tracking/${id}/${status}`).then((res)=>{
+                console.log(res.data)
+                Toast.show({
+                    type:"success",
+                    text1:res.data?.message
+                })
+                fetchMetals();
+                fetchCoins()
+            }).catch((error)=>{
+                Toast.show({
+                    type:"error",
+                    text1:error.response.data.error
+                })
+            })
+       } 
+
        return(
         <View style={styles.container} >
             {
@@ -77,8 +97,10 @@ const AddTracking = ()=>{
             <View style={styles.sectionContainer}>
             {
                 metals.map((item)=>(
-            <CheckedContainer  checked={item.Status=="1"}>
-                    <View style={styles.resourcesCard} key={item.Symbol}>
+
+            <CheckedContainer onPress={()=>{changeTrackingStatus({type:"metal",status:item.Status=="1"?"remove":"add",id:item.Id})}}  key={item.Symbol}  checked={item.Status=="1"}>
+                    <View
+                    style={styles.resourcesCard}>
                         <Image
                         height={40}
                         width={40}
@@ -95,8 +117,8 @@ const AddTracking = ()=>{
 
             {
                 coins.map((item)=>(
-            <CheckedContainer checked={item.Symbol=="1"}>
-                    <View style={styles.resourcesCard} key={item.Symbol}>
+            <CheckedContainer onPress={()=>{changeTrackingStatus({type:"coin",status:item.Status=="1"?"remove":"add",id:item.Id})}} key={item.Symbol} checked={item.Symbol=="1"}>
+                    <View style={styles.resourcesCard} >
                         <Image
                         height={40}
                         width={40}

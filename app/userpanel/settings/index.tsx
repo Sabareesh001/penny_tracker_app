@@ -1,14 +1,20 @@
+import { Button } from "@/components/atoms/button/button";
 import { Label } from "@/components/atoms/label/label";
 import Select from "@/components/atoms/select/select";
+import { useLoginCtx } from "@/store/loginContext";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { navigate } from "expo-router/build/global-state/routing";
+import * as SecureStore from "expo-secure-store"
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 export default function Settings() {
   const { theme } = useTheme();
+  const { loggedIn, setLoggedIn } = useLoginCtx();
 
   const styles = StyleSheet.create({
     container: {
@@ -19,6 +25,9 @@ export default function Settings() {
     form:{
       flex:1,
       gap:theme?.gaps.form
+    },
+    button:{
+       height:50
     }
   });
 
@@ -78,6 +87,13 @@ export default function Settings() {
       });
   }
 
+  const Logout = async()=>{
+
+     await SecureStore.deleteItemAsync("authToken");
+     setLoggedIn!=null && setLoggedIn(false)
+     navigate("/login")
+  }
+
 
   return (
     <View style={styles.container}>
@@ -122,6 +138,9 @@ export default function Settings() {
             }
             open={openState.currency}
           />
+          <View style={styles.button}>
+          <Button title="Logout" onPress={Logout} icon={<MaterialIcons color={theme?.colors.secondary} size={24} name="logout"/>}/>
+          </View>
             </View>
     </View>
   );

@@ -15,6 +15,9 @@ import {
   useFormState,
 } from "react-hook-form";
 import { FormFields } from "./types";
+import { StyleSheet } from "react-native";
+import { useTheme } from "@/theme/themeProvider";
+import { View } from "react-native";
 
 type section2Fields = {
   age: number;
@@ -36,6 +39,9 @@ const Section2 = ({
   setCurrentSection: React.Dispatch<React.SetStateAction<number>>;
   getFieldState: UseFormGetFieldState<FormFields>;
 }) => {
+
+  const {theme} = useTheme();
+
   const [genderOpen, setGenderOpen] = useState(false);
   const [genderItems, setGenderItems] = useState([]);
 
@@ -133,8 +139,15 @@ const Section2 = ({
     setLoading(false);
   };
 
+  const styles = StyleSheet.create(
+     {container:{
+      width:'100%',
+      gap:theme?.gaps.form
+    }}
+  )
+
   return (
-    <>
+    <View style= {styles.container}>
       {/* Age Slider */}
       <Controller
         control={control}
@@ -243,7 +256,7 @@ const Section2 = ({
         onPress={onSubmit}
         title={"Next"}
       />
-    </>
+    </View>
   );
 };
 
