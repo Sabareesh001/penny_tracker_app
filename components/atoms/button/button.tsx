@@ -1,56 +1,43 @@
 import { useTheme } from "@/theme/themeProvider";
-import { GestureResponderEvent, Pressable, StyleSheet, Text, View } from "react-native";
-import { CircularProgress } from '@expo/ui/jetpack-compose';
-const Button = ({loading,title,onPress,inverted,disabled}:{loading?:boolean,title:string,onPress:((event: GestureResponderEvent) => void),inverted?:boolean,disabled?:boolean})=>{
+import { ButtonProps, Button as ThemedButton } from "@rneui/themed";
+import { StyleSheet } from "react-native";
+const Button = (props:ButtonProps & {height?:number})=>{
     const {theme} = useTheme()
+    const spinnerColor = !props.disabled?theme?.colors.secondary:theme?.colors.primary
     const styles = StyleSheet.create({
-        button:{
-            width:'100%',
-            alignItems:'center',
-            justifyContent:'center',
-            borderWidth:theme?.border.borderWidth,
-            padding:theme?.button.primary.padding,
-            borderRadius:theme?.border.radius,
-            borderColor:theme?.border.color,
-            backgroundColor:theme?.colors.primary,
-        },
-        buttonDisabled:{
-           backgroundColor:theme?.colors.primaryDisabled,
-        },
-        buttonInvert:{
-             borderColor:theme?.border.color,
-            backgroundColor:theme?.colors.secondary,
-        },
-        content:{
-            height:30,
-        },
-        label:{
-            color:theme?.colors.secondary,
-            fontSize:theme?.button.primary.fontSize,
-        }
-        ,
-        labelInverted : {
-            color:theme?.colors.primary
-        }
+       title:{
+          color:theme?.colors.secondary
+       },
+       loading:{
+        
+       },
+       disabled:{
+        backgroundColor:theme?.colors.primaryDisabled,
+    },
+    diabledTitle:{
+       color:theme?.colors.secondary
+    },
+    container:{
+        borderRadius:theme?.border.radius,
+        borderWidth:theme?.border.borderWidth,
+        borderColor:theme?.border.color,
+       }
+       ,
+       button:{
+        height:props.height || 50,
+        gap:theme?.gaps.info
+       },
+       iconContainerStyle:{
+          
+       }
+       
     })
     return(
-        <Pressable onPress={onPress} disabled={loading || disabled} style={{...styles.button,...(inverted && styles.buttonInvert),...(disabled && styles.buttonDisabled)}} >
-            <View style={styles.content}>
-            {
-                loading?
-                (
-                    <CircularProgress progress={null} style={{ width: 28, height:28 }}  color={theme?.colors.secondary} elementColors={{ trackColor: 'transparent' }}/>
-                ):(
-                    <Text style={{...styles.label,...(inverted && styles.labelInverted)}}>
-                    {title}
-                    </Text>
-                )
-            }
-            </View>
-            
-        </Pressable>
+        <ThemedButton iconContainerStyle={styles.iconContainerStyle}  buttonStyle={styles.button} disabledTitleStyle={styles.diabledTitle} disabledStyle={styles.disabled} containerStyle={styles.container}  loadingProps={{color:spinnerColor}} titleStyle={styles.title} {...props} >
+
+        </ThemedButton>
     )
 
 }
 
-export {Button};
+export { Button };

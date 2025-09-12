@@ -47,14 +47,16 @@ type Theme = {
         }
     },
     paddings:{
-        screen : number
+        screen : number,
+        page:number
     },
     button:{
         primary : {
             fontSize : number,
             padding:number
         }
-    }
+    },
+    
 }
 
 
@@ -137,7 +139,8 @@ const getTheme = (colorScheme:string):Theme=>{
             info:3,
         },
         paddings:{
-            screen : 50
+            screen : 50,
+            page:20
         },
         button:{
             primary:{

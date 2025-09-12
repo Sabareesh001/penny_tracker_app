@@ -1,11 +1,12 @@
-import { BASE_URL } from "@/app/utils/apiHost";
 import { Button } from "@/components/atoms/button/button";
 import { Label } from "@/components/atoms/label/label";
 import { TextField } from "@/components/atoms/textField/textField";
 import { FormErrorHandler } from "@/components/handlers/error";
 import { SomethingWentWrong } from "@/components/toasts/toasts";
+import { BASE_URL } from "@/utils/apiHost";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { navigate } from "expo-router/build/global-state/routing";
+import { useState } from "react";
 import {
   Control,
   Controller,
@@ -16,7 +17,9 @@ import {
 } from "react-hook-form";
 import Toast from "react-native-toast-message";
 import { FormFields } from "./types";
-import { navigate } from "expo-router/build/global-state/routing";
+import { useTheme } from "@/theme/themeProvider";
+import { StyleSheet } from "react-native";
+import { View } from "react-native";
 
 type section3Fields = {
   username: string;
@@ -114,8 +117,17 @@ const Section3 = ({
       });
   };
 
+  const {theme} = useTheme();
+
+  const styles = StyleSheet.create({
+     container:{
+      width:'100%',
+      gap:theme?.gaps.form
+    }
+  })
+
   return (
-    <>
+    <View style={styles.container}>
       <Label error={!valid.username} required>
         Username
       </Label>
@@ -218,7 +230,7 @@ const Section3 = ({
         onPress={handleSubmit(onSubmit)}
         title={"Submit"}
       />
-    </>
+    </View>
   );
 };
 

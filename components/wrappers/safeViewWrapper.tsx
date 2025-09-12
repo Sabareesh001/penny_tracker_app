@@ -1,7 +1,9 @@
+import { getRneTheme } from "@/theme/rneTheme";
 import { useTheme } from "@/theme/themeProvider";
 import { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemeProvider as RneThemeProvider } from '@rneui/themed';
 
 
 const SafeViewWrapper = ({children}:{children:ReactNode})=>{
@@ -12,12 +14,15 @@ const SafeViewWrapper = ({children}:{children:ReactNode})=>{
             backgroundColor:backgroundColor
         }
     })
+    const rneTheme = getRneTheme();
   return(
+    <RneThemeProvider theme={rneTheme}>
     <View style={styles.wrapper} >
         <SafeAreaView>
         {children}
         </SafeAreaView>
     </View>
+    </RneThemeProvider>
   )
 }
 
