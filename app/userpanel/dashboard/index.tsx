@@ -1,11 +1,13 @@
-import { SectionHeading } from "@/components/atoms/heading/heading";
+import { Loader } from "@/components/atoms/loader";
 import { FloatingActionButton } from "@/components/floatingActionButton";
 import { TrackingCard } from "@/components/trackingCard";
+import { getFullPageLoader } from "@/store/pageContext";
 import { useTheme } from "@/theme/themeProvider";
+import { BASE_URL } from "@/utils/apiHost";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { router, useFocusEffect } from "expo-router";
 import axios from "axios";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
@@ -15,8 +17,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { BASE_URL } from "@/utils/apiHost";
-import { Loader } from "@/components/atoms/loader/loader";
 
 // ----------------------
 // Exported Types
@@ -37,6 +37,7 @@ export type ApiResponse<T> = {
 export type CardItem = {
   imgUrl: string;
   metal: string;
+  Id : number;
 };
 
 export type SectionData = {
@@ -51,12 +52,13 @@ export default function Dashboard() {
   const [weightMeasure, setWeightMeasure] = useState("ounce");
   const [metals, setMetals] = useState<ResourceData[]>([]);
   const [coins, setCoins] = useState<ResourceData[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const screenWidth = Dimensions.get("window").width;
   const cardSpacing = theme?.gaps?.form || 16;
   const numColumns = 2;
   const cardWidth = (screenWidth - cardSpacing * (numColumns + 2)) / numColumns;
+
+  const {fullPageLoaderOpen,setFullPageLoaderOpen} = getFullPageLoader();
 
   const styles = StyleSheet.create({
     container: {
@@ -96,6 +98,7 @@ export default function Dashboard() {
   // Fetch metals and coins from backend
   useFocusEffect(
   useCallback(() => {
+    setFullPageLoaderOpen && setFullPageLoaderOpen(true)
     const fetchResources = async () => {
       try {
         const [metalsRes, coinsRes] = await Promise.all([
@@ -108,7 +111,7 @@ export default function Dashboard() {
       } catch (err) {
         console.error("Error fetching resources:", err);
       } finally {
-        setLoading(false);
+         setFullPageLoaderOpen && setFullPageLoaderOpen(false);
       }
     };
 
@@ -127,6 +130,7 @@ export default function Dashboard() {
           return {
             imgUrl: m.Image,
             metal: m.Symbol,
+            Id : m.Id
           };
         })
         .filter((x): x is CardItem => Boolean(x)),
@@ -140,20 +144,15 @@ export default function Dashboard() {
           return {
             imgUrl: m.Image,
             metal: m.Symbol,
+            Id : m.Id
           };
         })
         .filter((x): x is CardItem => Boolean(x)),
     },
   ];
 
-  if (loading)
-    return (
-      <View style={styles.loaderView}>
-        <Loader color={theme?.colors.primary} />
-      </View>
-    );
-
   return (
+    !fullPageLoaderOpen &&
     <>
       <FlatList
         data={sections}
@@ -184,6 +183,7 @@ export default function Dashboard() {
                     imgUrl: item.imgUrl,
                     metal: item.metal,
                     unitMeasure: section.unitMeasure,
+                    metalId : item.Id,
                   },
                 })
               }

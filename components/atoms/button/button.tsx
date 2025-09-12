@@ -1,21 +1,21 @@
 import { useTheme } from "@/theme/themeProvider";
-import { GestureResponderEvent, Pressable, StyleSheet, Text, View } from "react-native";
-import { CircularProgress } from '@expo/ui/jetpack-compose';
-import { Loader } from "../loader/loader";
-import { Button as ThemedButton,ButtonProps } from "@rneui/themed";
-import { color } from "@rneui/base";
+import { ButtonProps, Button as ThemedButton } from "@rneui/themed";
+import { StyleSheet } from "react-native";
 const Button = (props:ButtonProps & {height?:number})=>{
     const {theme} = useTheme()
     const spinnerColor = !props.disabled?theme?.colors.secondary:theme?.colors.primary
     const styles = StyleSheet.create({
        title:{
-           color:theme?.colors.secondary
+          color:theme?.colors.secondary
        },
        loading:{
         
        },
        disabled:{
-        backgroundColor:theme?.colors.primaryDisabled
+        backgroundColor:theme?.colors.primaryDisabled,
+    },
+    diabledTitle:{
+       color:theme?.colors.secondary
     },
     container:{
         borderRadius:theme?.border.radius,
@@ -25,15 +25,19 @@ const Button = (props:ButtonProps & {height?:number})=>{
        ,
        button:{
         height:props.height || 50,
+        gap:theme?.gaps.info
+       },
+       iconContainerStyle:{
+          
        }
        
     })
     return(
-        <ThemedButton buttonStyle={styles.button} disabledStyle={styles.disabled} containerStyle={styles.container}  loadingProps={{color:spinnerColor}} titleStyle={styles.title} {...props}>
+        <ThemedButton iconContainerStyle={styles.iconContainerStyle}  buttonStyle={styles.button} disabledTitleStyle={styles.diabledTitle} disabledStyle={styles.disabled} containerStyle={styles.container}  loadingProps={{color:spinnerColor}} titleStyle={styles.title} {...props} >
 
         </ThemedButton>
     )
 
 }
 
-export {Button};
+export { Button };

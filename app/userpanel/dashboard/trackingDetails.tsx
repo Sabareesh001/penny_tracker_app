@@ -1,28 +1,31 @@
 import { Button } from "@/components/atoms/button/button";
 import { SectionHeading } from "@/components/atoms/heading/heading";
+import { FullPageLoader } from "@/components/atoms/loader";
 import { TextField } from "@/components/atoms/textField/textField";
 import { TrackingCard } from "@/components/trackingCard";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
+import { gramToOunce } from "@/utils/weightConvertor";
 import AntDesign from "@expo/vector-icons/AntDesign"
 import Ionicons from "@expo/vector-icons/Ionicons";
+import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function TrackingDetails() {
     const params = useLocalSearchParams()
-    const [holding, setHolding] = useState(0.0)
+    const [holding, setHolding] = useState(-1)
     const incrementRef = useRef<number | null>(null);
     const decrementRef = useRef<number | null>(null);
     const [editingWeight,setEditingWeight] = useState(false);
-    const [modifiedHolding, setModifiedHolding] = useState(0.0);
-    const [resourceDisplayText,setReasourceDisplayText] = useState("");
-    const { imgUrl, metal, unitMeasure, isModal } = params;
+    const [modifiedHolding, setModifiedHolding] = useState(-1);
+    const { imgUrl, metal, unitMeasure,metalId,isModal } = params;
     const[saveLoading,setSaveLoading] = useState(false);
+    const [refreshKey,setRefreshKey] = useState(-1);
     const { theme } = useTheme();
-
     useEffect(() => {
         setModifiedHolding(holding)
     }, [holding])
@@ -85,32 +88,43 @@ export default function TrackingDetails() {
         ref.current != null && clearInterval(ref.current)
     }
 
-    const handleWeightSubmit = ()=>{
+    const handleWeightSubmit = async()=>{
         setSaveLoading(true)
-        axios.post(`${BASE_URL}/api/v1/metal/weight`,{metal_id:3,weight:modifiedHolding}).then(()=>{
+        const finalWeight = unitMeasure=="gram"?gramToOunce(modifiedHolding):modifiedHolding
+        console.log(metalId)
+        axios.post(`${BASE_URL}/api/v1/${unitMeasure=="coin"?"coin":"metal"}/${unitMeasure=="coin"?"quantity":"weight"}`,{metal_id:Number(metalId),weight:finalWeight}).then((res)=>{
+          
+            Toast.show({
+                type:"success",
+                text1:res.data.message
+            })
+
 
         }).finally(()=>{
             setSaveLoading(false)
+            setRefreshKey((prev)=>prev*-1)
         })
     }
 
     return (
         <View style={styles.containerStyle}>
-            <TrackingCard
+           
+            {refreshKey>-2 && <TrackingCard
                 height={250}
+                key={refreshKey}
                 imgUrl={Array.isArray(imgUrl) ? "" : imgUrl}
                 metal={Array.isArray(metal) ? "" : metal}
                 unitMeasure={Array.isArray(unitMeasure) ? "" : unitMeasure}
                 isModal={true}
                 setHolding={setHolding}
-            />
+            />}
             <View style={styles.optionsContainer}>
                 <Pressable  onPressOut={() => { handlePressOut(decrementRef) }} onLongPress={handleDecrementLongPress} onPress={handleDecrementPress}>
                     <View style={styles.optionContainer}>
                         <AntDesign size={24} color={theme?.colors.danger.danger} name="minus" />
                     </View>
                 </Pressable>
-                <TextField  width={200} inputMode="numeric" onPress={()=>{setEditingWeight(true)}} onChangeText={(e)=>{if(!Number.isNaN(Number(e))) setModifiedHolding(Number(e));}} onSubmitEditing={()=>setEditingWeight(false)} keyboardType="number-pad" style={styles.resourceManagement} >
+                <TextField flex={1}   width={200} inputMode="numeric" onPress={()=>{setEditingWeight(true)}} onChangeText={(e)=>{if(!Number.isNaN(Number(e))) setModifiedHolding(Number(e));}} onSubmitEditing={()=>setEditingWeight(false)} keyboardType="number-pad" style={styles.resourceManagement} >
                 {`${editingWeight?modifiedHolding:modifiedHolding.toFixed(2)}`+`${editingWeight?"":" "+unitMeasure+"s"}`}
                 </TextField>
                 <Pressable  onPressOut={() => { handlePressOut(incrementRef) }} onLongPress={handleIncrementLongPress} onPress={handleIncrementPress}>
@@ -119,10 +133,9 @@ export default function TrackingDetails() {
                     </View>
                 </Pressable>
             </View>
-            {
-             modifiedHolding.toFixed(2) !== holding.toFixed(2) && 
+            { 
             (<View style={styles.buttonContainer}>
-                <Button loading={saveLoading} onPress={handleWeightSubmit} icon={<Ionicons color={theme?.colors.secondary} size={24} name="save" />} title="Save"/>
+                <Button loading={saveLoading} disabled={ modifiedHolding==-1 || modifiedHolding.toFixed(2) === holding.toFixed(2)} onPress={handleWeightSubmit} icon={<Ionicons color={theme?.colors.secondary} size={24} name="save-outline" />} title="Save"/>
             </View>)
             }
         </View>

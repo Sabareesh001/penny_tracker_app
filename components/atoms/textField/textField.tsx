@@ -2,7 +2,15 @@ import { useTheme } from "@/theme/themeProvider";
 import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
 import { Note } from "../note/note";
 
-export type TextFieldProps = {error?:boolean,errorNote?:boolean,note?:string,height?:number,width?:number} & TextInputProps
+export type TextFieldProps = 
+{
+  error?:boolean,
+  errorNote?:boolean,
+  note?:string,
+  height?:number,
+  width?:number,
+  flex?:number
+} & TextInputProps
 
 
 const TextField = (props:TextFieldProps)=>{
@@ -18,6 +26,7 @@ const TextField = (props:TextFieldProps)=>{
         flex:1,
       },
       container:{
+        flex:props.flex,
         height:props.height || 50,
 
       },

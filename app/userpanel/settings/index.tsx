@@ -5,17 +5,18 @@ import { useLoginCtx } from "@/store/loginContext";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { useFocusEffect } from "expo-router";
 import { navigate } from "expo-router/build/global-state/routing";
 import * as SecureStore from "expo-secure-store"
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 export default function Settings() {
   const { theme } = useTheme();
   const { loggedIn, setLoggedIn } = useLoginCtx();
-
+  const [logoutLoading,setLogoutLoading] = useState(false);
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -49,7 +50,45 @@ export default function Settings() {
     Name: string;
   };
 
-  useEffect(() => {
+
+  
+    const fetchCurrencyList = async()=>{
+
+      const currencyListStored = useAsyncStorage("currencyList")
+
+      const currencyList = await currencyListStored.getItem()
+      
+
+      if(currencyList!=null){
+         const stringToJSON =   JSON.parse(currencyList)
+         setCurrencyList(stringToJSON)
+         return
+      }
+
+      console.log("REACHED")
+
+      axios
+        .get(`${BASE_URL}/api/v1/currency`)
+        .then(async(res) => {
+          if (res.data?.data) {
+            const formattedList = res.data.data.map((value: CurrencyData) =>{
+              return({
+              label: `${value.UnicodeFlag} ${value.Currency} - ${value.Name}`,
+              value: `${value.Currency}-${value.Name}`,
+            })});
+            
+            await currencyListStored.setItem(JSON.stringify(formattedList))
+
+            setCurrencyList(formattedList);
+          }
+        })
+        .catch((err) => {
+          console.log(err.response);
+        });
+    }
+
+  useFocusEffect(
+    useCallback(() => {
     (async () => {
       const savedCurrency = await AsyncStorage.getItem("currency") || "";
       const savedWeightMeasure = await AsyncStorage.getItem("weightMeasure") || "";
@@ -64,33 +103,17 @@ export default function Settings() {
 
     fetchCurrencyList()
 
-  }, []);
+  }, [])
+  )
 
-
-
-  const fetchCurrencyList = ()=>{
-    axios
-      .get(`${BASE_URL}/api/v1/currency`)
-      .then((res) => {
-        if (res.data?.data) {
-          const formattedList = res.data.data.map((value: CurrencyData) =>{
-            return({
-            label: `${value.UnicodeFlag} ${value.Currency} - ${value.Name}`,
-            value: `${value.Currency}-${value.Name}`,
-          })});
-            
-          setCurrencyList(formattedList);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
 
   const Logout = async()=>{
 
+     setLogoutLoading(true);
+
      await SecureStore.deleteItemAsync("authToken");
      setLoggedIn!=null && setLoggedIn(false)
+     setLogoutLoading(false)
      navigate("/login")
   }
 
@@ -139,7 +162,7 @@ export default function Settings() {
             open={openState.currency}
           />
           <View style={styles.button}>
-          <Button title="Logout" onPress={Logout} icon={<MaterialIcons color={theme?.colors.secondary} size={24} name="logout"/>}/>
+          <Button loading={logoutLoading} title="Logout" onPress={Logout} icon={<MaterialIcons color={theme?.colors.secondary} size={24} name="logout"/>}/>
           </View>
             </View>
     </View>

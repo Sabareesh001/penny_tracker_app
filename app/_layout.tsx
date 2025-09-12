@@ -9,6 +9,8 @@ import { navigate } from "expo-router/build/global-state/routing";
 import { useEffect } from "react";
 import { LoginContextProvider } from "@/store/loginContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FullPageLoader } from "@/components/atoms/loader";
+import { FullPageLoaderProvider } from "@/store/pageContext";
 
 export default function RootLayout() {
 
@@ -26,12 +28,15 @@ export default function RootLayout() {
   return (
     <LoginContextProvider>
       <ThemeProvider>
+        <FullPageLoaderProvider>
+          <FullPageLoader/>
         <SafeViewWrapper>
           <View style={{ zIndex: 1 }}>
             <ToastStyled />
           </View>
           <Slot />
         </SafeViewWrapper>
+        </FullPageLoaderProvider>
       </ThemeProvider>
     </LoginContextProvider>
   );

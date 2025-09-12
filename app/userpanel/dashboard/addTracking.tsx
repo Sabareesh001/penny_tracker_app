@@ -1,8 +1,9 @@
 import { Card } from "@/components/atoms/card/card";
 import { SectionHeading } from "@/components/atoms/heading/heading";
-import { Loader } from "@/components/atoms/loader/loader";
+import { Loader } from "@/components/atoms/loader";
 import { ToastStyled } from "@/components/atoms/toast/toast";
 import { CheckedContainer } from "@/components/checkedContainer";
+import { getFullPageLoader } from "@/store/pageContext";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
 import axios from "axios";
@@ -26,6 +27,8 @@ export interface TrackingResponse {
 
 const AddTracking = ()=>{
 
+       const {fullPageLoaderOpen,setFullPageLoaderOpen} = getFullPageLoader()
+
        const [metals,setMetals] = useState<TrackingItem[]>([]);
        const [coins,setCoins] = useState<TrackingItem[]>([]);
     
@@ -41,6 +44,16 @@ const AddTracking = ()=>{
              setCoins(res.data.data);
           })
        }
+
+
+       useEffect(()=>{
+          if(metals.length == 0 && coins.length == 0){
+           setFullPageLoaderOpen && setFullPageLoaderOpen(true)
+          }
+          else if(fullPageLoaderOpen){
+           setFullPageLoaderOpen &&  setFullPageLoaderOpen(false)
+          }
+       },[metals,coins])
 
        useEffect(()=>{
           fetchCoins()
@@ -71,7 +84,9 @@ const AddTracking = ()=>{
        })
 
        const changeTrackingStatus = ({type,status,id}:{type:"metal" | "coin",status:"add" | "remove",id:Number})=>{
-        console.log(id)
+            
+            setFullPageLoaderOpen && setFullPageLoaderOpen(true)
+
             axios.post(`${BASE_URL}/api/v1/${type}/tracking/${id}/${status}`).then((res)=>{
                 console.log(res.data)
                 Toast.show({
@@ -85,14 +100,14 @@ const AddTracking = ()=>{
                     type:"error",
                     text1:error.response.data.error
                 })
+            }).finally(()=>{
+                setFullPageLoaderOpen && setFullPageLoaderOpen(false)
             })
        } 
 
        return(
         <View style={styles.container} >
-            {
-                metals.length == 0 && coins.length == 0 && <Loader color={theme?.colors.primary}></Loader>
-            }
+         
            { metals.length>0 && <SectionHeading>Metals</SectionHeading>}
             <View style={styles.sectionContainer}>
             {
@@ -117,7 +132,7 @@ const AddTracking = ()=>{
 
             {
                 coins.map((item)=>(
-            <CheckedContainer onPress={()=>{changeTrackingStatus({type:"coin",status:item.Status=="1"?"remove":"add",id:item.Id})}} key={item.Symbol} checked={item.Symbol=="1"}>
+            <CheckedContainer onPress={()=>{changeTrackingStatus({type:"coin",status:item.Status=="1"?"remove":"add",id:item.Id})}} key={item.Symbol} checked={item.Status=="1"}>
                     <View style={styles.resourcesCard} >
                         <Image
                         height={40}
