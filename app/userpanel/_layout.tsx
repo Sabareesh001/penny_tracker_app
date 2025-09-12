@@ -30,10 +30,20 @@ export default function UserPanelLayout(){
               tabBarLabel: "Dashboard",
               headerTitle: "Dashboard",
               tabBarIcon: ({ color }) => (
-                <FontAwesome size={28} name="home" color={color} />
+                <FontAwesome size={28} name="dashboard" color={color} />
               ),
             }}
           />
+            <Tabs.Screen
+              name={"ledger/index"}
+              options={{
+                tabBarLabel: "Ledger",
+                headerTitle: "Ledger",
+                tabBarIcon: ({ color }) => (
+                  <FontAwesome size={28} name="book" color={color} />
+                ),
+              }}
+            />
           <Tabs.Screen
             name={"settings/index"}
             options={{
