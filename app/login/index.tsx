@@ -32,10 +32,7 @@ const Login = () => {
   const onSubmit = (data: any) => {
     setLoading(true);
     axios
-      .post(`${BASE_URL}/api/v1/user/auth/userpass`, data, {
-        timeout: 5000,
-        timeoutErrorMessage: "Server is not responding",
-      })
+      .post(`${BASE_URL}/api/v1/user/auth/userpass`, data)
       .then((res) => {
         Toast.show({
           type: "success",
@@ -46,13 +43,6 @@ const Login = () => {
         navigate("../userpanel")
       })
       .catch((error) => {
-        if (!error.response) {
-          Toast.show({
-            type: "info",
-            text1: error.message,
-          });
-          return;
-        }
         Toast.show({
           type: "error",
           text1: error.response.data.error,

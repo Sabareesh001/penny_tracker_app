@@ -11,8 +11,48 @@ import { LoginContextProvider } from "@/store/loginContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FullPageLoader } from "@/components/atoms/loader";
 import { FullPageLoaderProvider } from "@/store/pageContext";
-
+import * as SecureStore from "expo-secure-store";
+import Toast from "react-native-toast-message";
 export default function RootLayout() {
+
+    const { loggedIn, setLoggedIn } = useLoginCtx();
+
+  useEffect(()=>{
+    
+    const resInterceptor = axios.interceptors.response.use(
+    config => config,
+    async (error) => {
+      if(error.code === "ECONNABORTED" || !error.response){
+        Toast.show({
+          type:"info",
+          text1:"Network Error"
+        })
+      }
+      else if (error.response?.status === 401) {   
+        await SecureStore.deleteItemAsync("authToken");
+        setLoggedIn && setLoggedIn(false);
+        navigate("/login");
+      }
+      console.log(error)
+      return Promise.reject(error);
+    }
+  );
+
+  const reqInterceptor = axios.interceptors.request.use(
+    async (config) => {
+      const token = await SecureStore.getItemAsync("authToken");
+      config.timeout = 5000;
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+  return () => {
+    axios.interceptors.request.eject(reqInterceptor);
+    axios.interceptors.response.eject(resInterceptor);
+  };
+}, []);
 
   useEffect(()=>{
     (async()=>{

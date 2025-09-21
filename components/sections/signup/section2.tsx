@@ -243,7 +243,6 @@ const Section2 = ({
 
       {/* Navigation Buttons */}
       <Button
-        inverted
         title={"Back"}
         onPress={() => {
           setCurrentSection(0);

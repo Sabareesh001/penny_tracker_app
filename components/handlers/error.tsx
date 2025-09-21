@@ -29,12 +29,7 @@ const FormErrorHandler = (name?: string, type?: string,message?:string) => {
         })
         break;
     }
-    default:
-        Toast.show({
-            type:"error",
-            text1:`Something Went Wrong`
-        });
-      break;
+
   }
 };
 
