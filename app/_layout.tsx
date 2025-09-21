@@ -10,12 +10,14 @@ import { useEffect } from "react";
 import { LoginContextProvider } from "@/store/loginContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FullPageLoader } from "@/components/atoms/loader";
-import { FullPageLoaderProvider } from "@/store/pageContext";
+import { FullPageLoaderProvider, getFullPageLoader } from "@/store/pageContext";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
 export default function RootLayout() {
 
     const { loggedIn, setLoggedIn } = useLoginCtx();
+
+    const {fullPageLoaderOpen,setFullPageLoaderOpen} = getFullPageLoader();
 
   useEffect(()=>{
     
@@ -27,6 +29,9 @@ export default function RootLayout() {
           type:"info",
           text1:"Network Error"
         })
+  
+        setFullPageLoaderOpen && setFullPageLoaderOpen(false);
+
       }
       else if (error.response?.status === 401) {   
         await SecureStore.deleteItemAsync("authToken");
@@ -41,7 +46,7 @@ export default function RootLayout() {
   const reqInterceptor = axios.interceptors.request.use(
     async (config) => {
       const token = await SecureStore.getItemAsync("authToken");
-      config.timeout = 5000;
+      config.timeout = 10000;
       if (token) config.headers.Authorization = `Bearer ${token}`;
       return config;
     },
