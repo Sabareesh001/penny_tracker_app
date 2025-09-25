@@ -8,7 +8,7 @@ export type TextFieldProps =
   errorNote?:boolean,
   note?:string,
   height?:number,
-  width?:number,
+  width?:number | string,
   flex?:number
 } & TextInputProps
 
@@ -23,12 +23,10 @@ const TextField = (props:TextFieldProps)=>{
         borderRadius: theme?.border.radius,
         color: theme?.colors.input,
         fontSize: theme?.text.section.label.fontSize,
-        flex:1,
       },
       container:{
         flex:props.flex,
         height:props.height || 50,
-
       },
       textInputError: {
         borderColor: theme?.colors.danger.danger,

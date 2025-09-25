@@ -140,7 +140,7 @@ const TrackingCard = (props: TrackingCardProps) => {
       margin: 30,
     },
     trackingName: {
-      color: theme?.colors.secondary,
+      color: theme?.colors.text,
       fontWeight: "bold",
       fontSize: props.isModal ? theme?.text.section.heading.fontSize : 18,
     },
@@ -150,7 +150,7 @@ const TrackingCard = (props: TrackingCardProps) => {
       alignItems: "flex-start",
     },
     infoText: {
-      color: theme?.colors.secondary,
+      color: theme?.colors.text,
       fontSize: props.isModal ? 18 : theme?.text.section.label.fontSize,
     },
     topRightIcons: {
@@ -175,7 +175,7 @@ const TrackingCard = (props: TrackingCardProps) => {
           <View style={styles.topRightIcons}>
             <Ionicons
               size={TOP_RIGHT_ICON_SIZE}
-              color={theme?.colors.secondary}
+              color={theme?.colors.text}
               name="reload-circle"
               onPress={fetchMetalPrice}
             />
@@ -197,7 +197,7 @@ const TrackingCard = (props: TrackingCardProps) => {
               <View style={styles.fieldBox}>
                 <View style={styles.icon}>
                   <MaterialIcons
-                    color={theme?.colors.secondary}
+                    color={theme?.colors.text}
                     size={INFO_ICON_SIZE}
                     name="savings"
                   />
@@ -213,7 +213,7 @@ const TrackingCard = (props: TrackingCardProps) => {
               <View style={styles.fieldBox}>
                 <View style={styles.icon}>
                   <Ionicons
-                    color={theme?.colors.secondary}
+                    color={theme?.colors.text}
                     size={INFO_ICON_SIZE}
                     name="bag"
                   />

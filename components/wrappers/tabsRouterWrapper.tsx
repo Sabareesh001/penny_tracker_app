@@ -23,7 +23,7 @@ const StyledTabs = (props:StyledTabsProps) => {
         tabBarActiveTintColor:theme?.colors.primary,
         tabBarInactiveTintColor:theme?.colors.primaryDisabled,
         tabBarLabelStyle: {
-          color: theme?.colors.primary,
+          color: theme?.colors.text,
         },
         headerStyle: {
           backgroundColor: theme?.colors.secondary,
@@ -33,7 +33,7 @@ const StyledTabs = (props:StyledTabsProps) => {
         },
         headerStatusBarHeight: 0,
         headerTitleStyle: {
-          color: theme?.colors.primary,
+          color: theme?.colors.text,
         },
         sceneStyle: {
           backgroundColor: "transparent",
