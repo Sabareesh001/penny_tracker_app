@@ -11,6 +11,7 @@ import axios, { Axios, AxiosResponse } from "axios";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function Ledger(){
 
@@ -20,6 +21,8 @@ export default function Ledger(){
 
     const [monthyIncome,setMonthlyIncome] = useState(0.0)
     const [originalMonthlyIncome,setOriginalMonthlyIncome] = useState(0.0)
+    const [monthySavingsTarget,setMonthySavingsTarget] = useState(0.0)
+    const [originalMonthlySavingsTarget,setOriginalMonthlySavingsTarget] = useState(0.0)
     const [currencySymbol,setCurrencySymbol] = useState("")
     const [incomeSaveLoading,setIncomeSaveLoading] = useState(false)
 
@@ -54,9 +57,15 @@ export default function Ledger(){
     const saveNewIncome = ()=>{
         setIncomeSaveLoading(true)
         axios.patch(`${BASE_URL}/api/v1/income/`,{income:monthyIncome}).then((res)=>{
-            console.log(res)
+            Toast.show({
+                type:'success',
+                text1:res.data.message
+            })
         }).catch((err)=>{
-            console.log(err)
+             Toast.show({
+                type:'error',
+                text1:err.response.data.error
+            })
         }).finally(()=>{
             setIncomeSaveLoading(false)
         })
@@ -95,6 +104,19 @@ export default function Ledger(){
             </TextField>
                 </View>
             <Button onPress={saveNewIncome} loading={incomeSaveLoading} containerStyle={{flex:2}} disabled={originalMonthlyIncome==monthyIncome}  icon={<AntDesign  name="save"  size={20} color={theme?.colors.secondary}/>}/>
+            </View>
+             <Label>
+                Monthly Savings Target
+            </Label>
+            <View style={styles.incomeContainer}>
+                <View style={{flex:9}}>
+            <TextField keyboardType="number-pad" inputMode="numeric" onChangeText={(e)=>{setMonthySavingsTarget(()=>{
+                const converted = Number(e.slice(1))
+                return isNaN(converted)?0:converted
+            })}} editable value={`${currencySymbol} ${monthySavingsTarget}`}>
+            </TextField>
+                </View>
+            <Button onPress={saveNewIncome} loading={incomeSaveLoading} containerStyle={{flex:2}} disabled={originalMonthlySavingsTarget==monthySavingsTarget}  icon={<AntDesign  name="save"  size={20} color={theme?.colors.secondary}/>}/>
             </View>
         </View>
      )

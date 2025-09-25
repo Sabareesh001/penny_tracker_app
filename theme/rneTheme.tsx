@@ -20,6 +20,9 @@ const getRneTheme = ():CreateThemeOptions=>{
       components: {
         Button: {
           raised: true,
+          titleStyle:{
+            color:theme?.colors.text
+          }
         },
         CheckBox:{
             containerStyle:{

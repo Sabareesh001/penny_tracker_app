@@ -62,10 +62,10 @@ type Theme = {
 
 const darkTheme = {
     colors : {
-        primary:"#caf0f8",
-        primaryDisabled:"#83999e",
-        secondary:"#03045e",
-        section:"#023e8a",
+        primary:"#5842ff",
+        primaryDisabled:"#ffffff",
+        secondary:"#271c75",
+        section:"#ffffff",
         info:{
             info : "#ff7800",
             text : "#ff7800"
@@ -78,7 +78,7 @@ const darkTheme = {
             success :"#1a7f39",
             text:"#1a7f39"
         },
-        text : "#90e0ef",
+        text : "#fdfcff",
         input : "#caf0f8"
     }
 }
@@ -114,7 +114,7 @@ const getTheme = (colorScheme:string):Theme=>{
         border:{
             radius:5,
             borderWidth:1,
-            color:"#0077b6",
+            color:"#8878ff",
             padding:15
         },
          text:{

@@ -23,7 +23,7 @@ export default function UserPanelLayout(){
 
     return (
       <View style={styles.container}>
-        <StyledTabs>
+        <StyledTabs >
           <Tabs.Screen
             name={"dashboard"}
             options={{
@@ -46,6 +46,7 @@ export default function UserPanelLayout(){
             />
           <Tabs.Screen
             name={"settings/index"}
+            
             options={{
               tabBarLabel: "Settings",
               headerTitle: "Settings",
