@@ -8,10 +8,10 @@ import axios from "axios";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
-import { Card } from "../atoms/card/card";
-import { LiveIcon } from "../atoms/liveIcon/liveIcon";
-import { Loader } from "../atoms/loader";
-import ClampText from "../textClamper";
+import { Card } from "../../atoms/card/card";
+import { LiveIcon } from "../../atoms/liveIcon/liveIcon";
+import { Loader } from "../../atoms/loader";
+import ClampText from "../../textClamper";
 
 type TrackingCardProps = {
   metal: string;

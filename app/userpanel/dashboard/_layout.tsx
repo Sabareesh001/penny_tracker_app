@@ -1,14 +1,19 @@
+import { useTheme } from "@/theme/themeProvider";
 import { Slot, Stack } from "expo-router";
+import { View } from "react-native";
 
-export default function Layout(){
-    return(
-        <Stack
+export default function Layout() {
+  const { theme } = useTheme();
+  return(
+    <Stack
         screenOptions={{
-            headerShown:false,
+          headerShown:false,
             contentStyle:{
-                backgroundColor:'transparent'
-            }
+              backgroundColor:'transparent',
+              padding: 16,
+            },
         }}
+        
         >
           <Stack.Screen name="userpanel/dashboard" />
           <Stack.Screen name="userpanel/dashboard/trackingDetails" />

@@ -52,6 +52,11 @@ const getRneTheme = ():CreateThemeOptions=>{
                 borderWidth:theme?.border.borderWidth,
                 margin:0,
             }
+        },
+        Text:{
+          style:{
+            color:theme?.colors.text
+          }
         }
       },
 

@@ -2,7 +2,7 @@ import { Button } from "@/components/atoms/button/button";
 import { SectionHeading } from "@/components/atoms/heading/heading";
 import { FullPageLoader } from "@/components/atoms/loader";
 import { TextField } from "@/components/atoms/textField/textField";
-import { TrackingCard } from "@/components/trackingCard";
+import { TrackingCard } from "@/components/cards/tracking";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
 import { gramToOunce } from "@/utils/weightConvertor";
