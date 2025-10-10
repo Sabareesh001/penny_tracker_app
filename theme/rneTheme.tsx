@@ -24,6 +24,32 @@ const getRneTheme = ():CreateThemeOptions=>{
             color:theme?.colors.text
           }
         },
+        Tab: {
+          titleStyle(active) {
+            return (
+              {
+                color: active ? theme?.colors.text : theme?.colors.primaryDisabled,
+              }
+            )
+          },
+          indicatorStyle: {
+            backgroundColor: theme?.colors.primary,
+            
+          },
+          style: {
+            borderWidth: theme?.border.borderWidth,
+            borderColor: theme?.colors.primary,
+            borderRadius: theme?.border.radius,
+            backgroundColor:theme?.colors.neutral2
+          },
+         
+          buttonStyle(active) {
+            return ({
+              backgroundColor: active ? theme?.colors.primary : theme?.colors.neutral2,
+              padding: 0,
+              borderRadius:theme?.border.radius
+          })}
+        },
         CheckBox:{
             containerStyle:{
               margin:0,
@@ -46,16 +72,14 @@ const getRneTheme = ():CreateThemeOptions=>{
         },
         Card:{
             containerStyle:{
-                backgroundColor:theme?.colors.primary,
-                borderRadius:theme?.border.radius,
-                borderColor:theme?.border.color,
-                borderWidth:theme?.border.borderWidth,
-                margin:0,
+                backgroundColor:theme?.colors.neutral,
+            margin: 0,
+                borderRadius:theme?.border.radius
             }
         },
         Text:{
           style:{
-            color:theme?.colors.text
+            color: theme?.colors.text,
           }
         }
       },

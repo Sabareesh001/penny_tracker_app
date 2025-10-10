@@ -22,7 +22,7 @@ export default function TrackingDetails() {
     const decrementRef = useRef<number | null>(null);
     const [editingWeight,setEditingWeight] = useState(false);
     const [modifiedHolding, setModifiedHolding] = useState(-1);
-    const { imgUrl, metal, unitMeasure,metalId,isModal } = params;
+    const { imgUrl, metal, unitMeasure,metalId,isModal,barColor } = params;
     const[saveLoading,setSaveLoading] = useState(false);
     const [refreshKey,setRefreshKey] = useState(-1);
     const { theme } = useTheme();
@@ -36,14 +36,15 @@ export default function TrackingDetails() {
     const styles = StyleSheet.create({
         containerStyle: {
             height: "100%",
-            padding: theme?.paddings.page,
             backgroundColor: theme?.colors.secondary,
             gap: theme?.gaps.form,
+            alignItems:'center'
         },
         optionsContainer: {
             flexDirection: 'row',
             justifyContent:'space-between',
             alignItems: 'center',
+            width:'100%',
             gap: theme?.gaps.form
         },
         optionContainer: {
@@ -64,7 +65,8 @@ export default function TrackingDetails() {
             borderRadius: theme?.border.radius
         },
         buttonContainer:{
-            height:50,
+            height: 50,
+            width:'100%'
         }
     })
 
@@ -116,6 +118,7 @@ export default function TrackingDetails() {
                 metal={Array.isArray(metal) ? "" : metal}
                 unitMeasure={Array.isArray(unitMeasure) ? "" : unitMeasure}
                 isModal={true}
+                barColor={Array.isArray(barColor)?"":barColor}
                 setHolding={setHolding}
             />}
             <View style={styles.optionsContainer}>
@@ -135,7 +138,7 @@ export default function TrackingDetails() {
             </View>
             { 
             (<View style={styles.buttonContainer}>
-                <Button loading={saveLoading} disabled={ modifiedHolding==-1 || modifiedHolding.toFixed(2) === holding.toFixed(2)} onPress={handleWeightSubmit} icon={<Ionicons color={theme?.colors.secondary} size={24} name="save-outline" />} title="Save"/>
+                <Button  loading={saveLoading} disabled={ modifiedHolding==-1 || modifiedHolding.toFixed(2) === holding.toFixed(2)} onPress={handleWeightSubmit} icon={<Ionicons color={theme?.colors.secondary} size={24} name="save-outline" />} title="Save"/>
             </View>)
             }
         </View>

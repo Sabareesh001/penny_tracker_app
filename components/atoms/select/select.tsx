@@ -36,7 +36,8 @@ const Select = <T extends ValueType>(props: DropDownPickerProps<T>) => {
   dropDownContainerStyle={{...styles.container,...styles.dropdownContainer}}
   textStyle={styles.text}
   placeholderStyle={styles.placeholder}
-  listMode='SCROLLVIEW'
+    listMode='SCROLLVIEW'
+
   searchContainerStyle={styles.searchContainerStyle}
   searchTextInputStyle={styles.searchTextInputStyle}
   searchPlaceholderTextColor={theme?.colors.primaryDisabled}

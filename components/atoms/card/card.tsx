@@ -10,11 +10,9 @@ const Card = (props:CardProps & {children:React.ReactNode})=>{
     const styles = StyleSheet.create({
         cardContainer:{
            padding:theme?.border.padding,
-           borderColor: theme?.border.color,
-           borderWidth:theme?.border.borderWidth,
-           borderRadius:theme?.border.radius,
-           backgroundColor:theme?.colors.primary,
-           width:'100%'
+           backgroundColor:theme?.colors.secondary,
+            width: '100%',
+            borderWidth: 0,
         }
     })
     

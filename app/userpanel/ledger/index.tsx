@@ -24,7 +24,9 @@ export default function Ledger(){
     const [monthySavingsTarget,setMonthySavingsTarget] = useState(0.0)
     const [originalMonthlySavingsTarget,setOriginalMonthlySavingsTarget] = useState(0.0)
     const [currencySymbol,setCurrencySymbol] = useState("")
-    const [incomeSaveLoading,setIncomeSaveLoading] = useState(false)
+    const [incomeSaveLoading, setIncomeSaveLoading] = useState(false)
+    const [savingTargetSaveLoading, setSavingTargetSaveLoading] = useState(false);
+    
 
     const styles = StyleSheet.create({
         pageContainer : {
@@ -56,7 +58,8 @@ export default function Ledger(){
 
     const saveNewIncome = ()=>{
         setIncomeSaveLoading(true)
-        axios.patch(`${BASE_URL}/api/v1/income/`,{income:monthyIncome}).then((res)=>{
+        axios.patch(`${BASE_URL}/api/v1/income/`, { income: monthyIncome }).then((res) => {
+            setOriginalMonthlyIncome(monthyIncome)
             Toast.show({
                 type:'success',
                 text1:res.data.message
@@ -116,7 +119,7 @@ export default function Ledger(){
             })}} editable value={`${currencySymbol} ${monthySavingsTarget}`}>
             </TextField>
                 </View>
-            <Button onPress={saveNewIncome} loading={incomeSaveLoading} containerStyle={{flex:2}} disabled={originalMonthlySavingsTarget==monthySavingsTarget}  icon={<AntDesign  name="save"  size={20} color={theme?.colors.secondary}/>}/>
+            <Button onPress={saveNewIncome} loading={savingTargetSaveLoading} containerStyle={{flex:2}} disabled={originalMonthlySavingsTarget==monthySavingsTarget}  icon={<AntDesign  name="save"  size={20} color={theme?.colors.secondary}/>}/>
             </View>
         </View>
      )

@@ -2,24 +2,36 @@ import { Redirect } from "expo-router";
 import { navigate } from "expo-router/build/global-state/routing";
 import * as SecureStore from "expo-secure-store";
 import { createContext, useContext, useEffect, useState } from "react";
-
+import {jwtDecode, JwtPayload} from "jwt-decode"
 const LoginContext = createContext<{
   loggedIn: boolean;
   setLoggedIn?: React.Dispatch<React.SetStateAction<boolean>>;
-}>({ loggedIn: false });
+  userFirstName: string;
+  setUserFirstName?: React.Dispatch<React.SetStateAction<string>>;
+}>({ loggedIn: false, userFirstName: "User" });
 
 const LoginContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [loggedIn, setLoggedIn] = useState(false);
-
+  const [userFirstName,setUserFirstName] = useState("User")
   useEffect(() => {
     setLoggedIn(SecureStore.getItem("authToken") != null);
   }, []);
 
+  useEffect(() => {
+    if (loggedIn) {
+      const token = SecureStore.getItem("authToken");
+      if (token) {
+        const decoding:JwtPayload & {userId:number,userName:string} = jwtDecode(token);
+        setUserFirstName(decoding?.userName)
+      }
+      
+    }
+  },[loggedIn])
 
 
 
   return (
-    <LoginContext.Provider value={{ loggedIn, setLoggedIn }}>
+    <LoginContext.Provider value={{ loggedIn, setLoggedIn ,setUserFirstName,userFirstName}}>
       {children}
     </LoginContext.Provider>
   );
