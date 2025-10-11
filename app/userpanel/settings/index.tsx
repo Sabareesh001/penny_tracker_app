@@ -1,6 +1,7 @@
 import { Button } from "@/components/atoms/button/button";
 import { Label } from "@/components/atoms/label/label";
 import Select from "@/components/atoms/select/select";
+import { usePreferenceContext } from "@/store/currencyContext";
 import { useLoginCtx } from "@/store/loginContext";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
@@ -50,7 +51,7 @@ export default function Settings() {
     Name: string;
   };
 
-
+const {currency,setCurrency,weightMeasure,setWeightMeasure,setCountry} = usePreferenceContext()
   
     const fetchCurrencyList = async()=>{
 
@@ -74,7 +75,7 @@ export default function Settings() {
             const formattedList = res.data.data.map((value: CurrencyData) =>{
               return({
               label: `${value.UnicodeFlag} ${value.Currency} - ${value.Name}`,
-              value: `${value.Currency}-${value.Name}`,
+              value: `${value.Currency}-${value.Iso2}`,
             })});
             
             await currencyListStored.setItem(JSON.stringify(formattedList))
@@ -136,7 +137,7 @@ export default function Settings() {
           setValue={async (val) => {
             setSettingsData((prev) => ({ ...prev, weightMeasure: val(prev) }));
             await AsyncStorage.setItem("weightMeasure", val(null));
-            console.log(await AsyncStorage.getItem("weightMeasure"));
+            setWeightMeasure && setWeightMeasure(val(null));
           }}
         />
         <Label>Currency</Label>
@@ -153,7 +154,11 @@ export default function Settings() {
             setValue={async (val) => {
               setSettingsData((prev) => ({ ...prev, currency: val(prev) }));
               await AsyncStorage.setItem("currency", val(null));
-              console.log(await AsyncStorage.getItem("currency"));
+              const currencyPref = val(null); 
+              const currency = currencyPref.split("-")[0];
+              const country = currencyPref.split("-")[1];
+              setCurrency && setCurrency(currency);
+              setCountry && setCountry(country);
             }}
             items={currencyList}
             setOpen={() =>

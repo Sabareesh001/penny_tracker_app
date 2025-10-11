@@ -2,23 +2,24 @@ import { Button } from "@/components/atoms/button/button";
 import { SectionHeading } from "@/components/atoms/heading/heading";
 import { Label } from "@/components/atoms/label/label";
 import { TextField } from "@/components/atoms/textField/textField";
+import { usePreferenceContext } from "@/store/currencyContext";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
 import { GetCurrencySymbol } from "@/utils/currency";
+import { ConvertCurrency } from "@/utils/currency/currencyConvertor";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import axios, { Axios, AxiosResponse } from "axios";
 import getSymbolFromCurrency from "currency-symbol-map";
-import { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 export default function Ledger(){
 
     const {theme} = useTheme()
-
-    const currency = useAsyncStorage("currency")
-
+    const {currency,country,weightMeasure} = usePreferenceContext();
     const [monthyIncome,setMonthlyIncome] = useState(0.0)
     const [originalMonthlyIncome,setOriginalMonthlyIncome] = useState(0.0)
     const [monthySavingsTarget,setMonthySavingsTarget] = useState(0.0)
@@ -42,23 +43,35 @@ export default function Ledger(){
 
     type IncomeResponse = {
         message:string,
-        data:number
+        data: {
+            monthly_income: number,
+            monthly_income_currency :string
+        }
     }
 
     const fetchMonthlyIncome = ()=>{
 
-        axios.get(`${BASE_URL}/api/v1/income`).then((res:AxiosResponse<IncomeResponse>)=>{
-            setMonthlyIncome(res.data.data)
-            setOriginalMonthlyIncome(res.data.data)
+        axios.get(`${BASE_URL}/api/v1/income`).then(async (res: AxiosResponse<IncomeResponse>) => {
+            let convertedIncome = res.data.data.monthly_income;
+            const storedMonthlyIncomeCurrency = res.data.data.monthly_income_currency
+            if (storedMonthlyIncomeCurrency != currency) {
+              convertedIncome =   await ConvertCurrency({
+                  amount: res.data.data.monthly_income,
+                  from: storedMonthlyIncomeCurrency,
+                  to: currency,
+                });
+            }
+            setMonthlyIncome(convertedIncome)
+            setOriginalMonthlyIncome(convertedIncome)
         }).catch((err)=>{ 
             console.log(err.response)
         })
 
     }
 
-    const saveNewIncome = ()=>{
+    const saveNewIncome = async()=>{
         setIncomeSaveLoading(true)
-        axios.patch(`${BASE_URL}/api/v1/income/`, { income: monthyIncome }).then((res) => {
+        axios.patch(`${BASE_URL}/api/v1/income/`, { income: monthyIncome, currency:currency }).then((res) => {
             setOriginalMonthlyIncome(monthyIncome)
             Toast.show({
                 type:'success',
@@ -73,11 +86,14 @@ export default function Ledger(){
             setIncomeSaveLoading(false)
         })
     }
-    
-    useEffect(()=>{
-        fetchMonthlyIncome()
-    },[])
+    useFocusEffect(
+        useCallback(()=>{
+            fetchMonthlyIncome()
+        },[currency])
+    )
  
+
+
     useEffect(()=>{ 
 
         const setCurrSymbol = async()=>{
@@ -89,6 +105,8 @@ export default function Ledger(){
         
     },[currency])
     
+
+
     
 
 
@@ -101,9 +119,9 @@ export default function Ledger(){
             <View style={styles.incomeContainer}>
                 <View style={{flex:9}}>
             <TextField keyboardType="number-pad" inputMode="numeric" onChangeText={(e)=>{setMonthlyIncome(()=>{
-                const converted = Number(e.slice(1))
+                const converted = Number(e.split(" ")[1])
                 return isNaN(converted)?0:converted
-            })}} editable value={`${currencySymbol} ${monthyIncome}`}>
+            })}} editable value={`${currencySymbol} ${monthyIncome.toFixed(0)}`}>
             </TextField>
                 </View>
             <Button onPress={saveNewIncome} loading={incomeSaveLoading} containerStyle={{flex:2}} disabled={originalMonthlyIncome==monthyIncome}  icon={<AntDesign  name="save"  size={20} color={theme?.colors.secondary}/>}/>
@@ -119,7 +137,7 @@ export default function Ledger(){
             })}} editable value={`${currencySymbol} ${monthySavingsTarget}`}>
             </TextField>
                 </View>
-            <Button onPress={saveNewIncome} loading={savingTargetSaveLoading} containerStyle={{flex:2}} disabled={originalMonthlySavingsTarget==monthySavingsTarget}  icon={<AntDesign  name="save"  size={20} color={theme?.colors.secondary}/>}/>
+            <Button  loading={savingTargetSaveLoading} containerStyle={{flex:2}} disabled={originalMonthlySavingsTarget==monthySavingsTarget}  icon={<AntDesign  name="save"  size={20} color={theme?.colors.secondary}/>}/>
             </View>
         </View>
      )

@@ -1,6 +1,7 @@
 import { createTheme, CreateThemeOptions } from "@rneui/themed";
 import { useTheme } from "./themeProvider";
-
+import { View } from "react-native";
+import { LinearGradient } from 'expo-linear-gradient';
 const getRneTheme = ():CreateThemeOptions=>{
 
     const {theme} = useTheme();
@@ -18,6 +19,15 @@ const getRneTheme = ():CreateThemeOptions=>{
       },
       
       components: {
+        Skeleton: {
+          skeletonStyle: {
+            borderRadius: theme?.border.radius,
+          },
+          style: {
+            borderRadius:theme?.border.radius,
+          }
+          
+        },
         Button: {
           raised: true,
           titleStyle:{

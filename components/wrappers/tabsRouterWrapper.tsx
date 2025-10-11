@@ -1,22 +1,26 @@
+import { usePreferenceContext } from "@/store/currencyContext";
 import { useTheme } from "@/theme/themeProvider";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Pressable, View } from "react-native";
 import { Image, StyleSheet } from "react-native";
+import CountryFlag from "react-native-country-flag";
 
 type StyledTabsProps = React.ComponentProps<typeof Tabs>;
 
 const StyledTabs = (props: StyledTabsProps) => {
   const { theme } = useTheme();
-
+  const {country} = usePreferenceContext();
   const styles = StyleSheet.create({
     headerBackground: {
       flex: 1,
       borderBottomWidth: 0.5,
       borderColor:theme?.colors.text,
-      justifyContent: "center",
-      alignItems: "flex-end",
+      justifyContent: "flex-end",
+      alignItems: "center",
+      gap:theme?.gaps.form,
+      flexDirection:"row",
       padding: theme?.paddings.card,
     },
     qrScanIcon: {
@@ -24,6 +28,9 @@ const StyledTabs = (props: StyledTabsProps) => {
       padding: 5,
       borderRadius: 10,
     },
+    countryFlagStyle: {
+      borderRadius:100
+    }
   });
 
   return (
@@ -41,8 +48,10 @@ const StyledTabs = (props: StyledTabsProps) => {
         },
         headerBackground: () => (
           <View
+            
             style={styles.headerBackground}
           >
+            <CountryFlag style={StyleSheet.create({borderRadius:theme?.border.radius})} key={country} isoCode={country} size={28x} />
             <Pressable
              style={styles.qrScanIcon}
             >

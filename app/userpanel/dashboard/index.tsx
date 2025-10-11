@@ -20,24 +20,6 @@ import { ConvertCurrency } from "@/utils/currency/currencyConvertor";
 
 export default function Dashboard() {
   const { theme } = useTheme();
-  const currency = useAsyncStorage("currency");
-  const [monthyIncome, setMonthlyIncome] = useState(100);
-  const [convertedIncome, setConvertedIncome] = useState(0);
-  useEffect(() => {
-    const convertCurrency = async () => {
-
-      const curr = await currency.getItem();
-      const currSymbol = curr?.split("-")[0];
-      const converted = await ConvertCurrency({
-        amount: monthyIncome,
-        from: "USD",
-        to: currSymbol || "",
-      });
-      console.log("Converted", converted);
-      setConvertedIncome(converted);
-    }
-    convertCurrency();
-  },[monthyIncome,currency])
   const styles = StyleSheet.create({
     greetingText: {
       fontWeight: "bold",
@@ -83,7 +65,7 @@ export default function Dashboard() {
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <Text style={styles.greetingText}>{`${GreetingText()}`}</Text>
-        <SpendingBalance key={convertedIncome} monthlyIncome={convertedIncome} savingTarget={0}  />
+        <SpendingBalance />
         <View style={styles.graphContainer}>
           <View style={styles.graphDaysFilter}>
             <Select
