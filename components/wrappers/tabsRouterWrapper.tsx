@@ -1,7 +1,7 @@
 import { usePreferenceContext } from "@/store/currencyContext";
 import { useTheme } from "@/theme/themeProvider";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
 import React from "react";
 import { Pressable, View } from "react-native";
 import { Image, StyleSheet } from "react-native";
@@ -51,7 +51,9 @@ const StyledTabs = (props: StyledTabsProps) => {
             
             style={styles.headerBackground}
           >
-            <CountryFlag style={StyleSheet.create({borderRadius:theme?.border.radius})} key={country} isoCode={country} size={28x} />
+            <Pressable onPress={()=>{router.push("/userpanel/settings")}}>
+            <CountryFlag  style={StyleSheet.create({borderRadius:theme?.border.radius})} key={country} isoCode={country} size={28} />
+            </Pressable>
             <Pressable
              style={styles.qrScanIcon}
             >

@@ -70,11 +70,11 @@ type Theme = {
 const darkTheme = {
   colors: {
     primary: "#f47928",
-    primaryDisabled: "#ffffff",
+    primaryDisabled: "#fab073",
     secondary: "#111114",
     neutral: "#555555",
     neutral2: "#202020",
-    strokeNeutral:"#858282",
+    strokeNeutral: "#858282",
     section: "#ffffff",
     info: {
       info: "#ff7800",
@@ -89,7 +89,7 @@ const darkTheme = {
       text: "#1a7f39",
     },
     text: "#fdfcff",
-    input: "#caf0f8",
+    input: "#ffffff",
   },
   shadow: {
     text: "#00000048",
@@ -127,47 +127,46 @@ const lightTheme = {
 
 const getTheme = (colorScheme:string):Theme=>{
     const baseTheme = colorScheme==='dark'?darkTheme:lightTheme
-    let theme:Theme = {
-        ...baseTheme,
-        border:{
-            radius:5,
-            borderWidth:1,
-            color:"#f47928",
-            padding:15
+    let theme: Theme = {
+      ...baseTheme,
+      border: {
+        radius: 5,
+        borderWidth: 1,
+        color: darkTheme.colors.strokeNeutral,
+        padding: 15,
+      },
+      text: {
+        section: {
+          heading: {
+            color: "#ffffff",
+            fontSize: 24,
+          },
+          label: {
+            color: "#ffffff",
+            fontSize: 14,
+          },
         },
-         text:{
-        section:{
-            heading:{
-                color:'#caf0f8',
-                fontSize:24
-            },
-            label:{
-                color:"#caf0f8",
-                fontSize:14
-            }
+        note: {
+          fontSize: 11,
         },
-        note:{
-           fontSize:11
-        }
-    }
+      },
 
-        ,
-        gaps:{
-            form:15,
-            info:3,
+      gaps: {
+        form: 15,
+        info: 3,
+      },
+      paddings: {
+        screen: 50,
+        page: 20,
+        card: 15,
+      },
+      button: {
+        primary: {
+          fontSize: 18,
+          padding: 10,
         },
-        paddings:{
-            screen : 50,
-            page: 20,
-            card:15
-        },
-        button:{
-            primary:{
-                fontSize:18,
-                padding:10
-            }
-        }
-        }
+      },
+    };
 
     return theme
 }

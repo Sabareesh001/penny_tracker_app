@@ -19,7 +19,7 @@ const Button = (props:ButtonProps & {height?:number})=>{
     },
     container:{
         borderRadius:theme?.border.radius,
-        borderWidth:theme?.border.borderWidth,
+        // borderWidth:theme?.border.borderWidth,
         borderColor:theme?.border.color,
        }
        ,

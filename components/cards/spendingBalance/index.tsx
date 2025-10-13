@@ -38,7 +38,7 @@ const SpendingBalance = () => {
       .then(async (res) => {
         let convertedIncome = res.data.data.monthly_income;
         const storedMonthlyIncomeCurrency = res.data.data.monthly_income_currency;
-          if (storedMonthlyIncomeCurrency != currency) {
+          if (storedMonthlyIncomeCurrency != currency || convertedIncome != 0) {
             convertedIncome = await ConvertCurrency({
               amount: res.data.data.monthly_income,
               from: storedMonthlyIncomeCurrency,

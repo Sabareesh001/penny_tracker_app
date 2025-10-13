@@ -14,7 +14,7 @@ const ToastStyled = ()=>{
               <ErrorToast
                 {...props}
                 style={{
-                    backgroundColor:theme?.colors.primary,
+                    backgroundColor:theme?.colors.neutral2,
                     borderLeftColor:theme?.colors.danger.danger
                 }}
                 text1Style={
@@ -32,7 +32,7 @@ const ToastStyled = ()=>{
               <SuccessToast
                 {...props}
                 style={{
-                    backgroundColor:theme?.colors.primary,
+                    backgroundColor:theme?.colors.neutral2,
                     borderLeftColor:theme?.colors.success.success,
                 }}
                 text1Style={
@@ -50,7 +50,7 @@ const ToastStyled = ()=>{
                 <InfoToast
                 {...props}
                  style={{
-                    backgroundColor:theme?.colors.primary,
+                    backgroundColor:theme?.colors.neutral2,
                     borderLeftColor:theme?.colors.info.info,
                 }}
                 text1Style={
