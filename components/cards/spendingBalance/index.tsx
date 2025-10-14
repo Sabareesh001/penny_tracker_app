@@ -27,12 +27,41 @@ const SpendingBalance = () => {
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [savingTarget, setSavingTarget] = useState(0);
   const [spendingBalance, setSpendingBalance] = useState(0);
-  const [currencySymbol, setCurrencySymbol] = useState("");
+  const currencySymbol = GetCurrencySymbol();
   const [spendingBalanceLoading, setSpendingBalanceLoading] = useState(false);
 
   const rotatePanda = useRef(new Animated.Value(0)).current;
   const [reactionImage, setReactionImage] = useState(happy);
+  const [monthlyPayments, setMonthlyPayments] = useState(0);
 
+  // ========== Fetch Monthly Payments ==========
+  const fetchMonthlyPayments = async () => {
+    setSpendingBalanceLoading(true);
+    try {
+      const now = new Date();
+      const month = now.getMonth() + 1; // JS months are 0-indexed
+      const year = now.getFullYear();
+
+      const res = await axios.get(`${BASE_URL}/api/v1/spending/monthly-total`, {
+        params: { month, year }, // send as query params
+      });
+
+      if (res.data.data && res.data.data.total !== undefined) {
+        let total = res.data.data.total;
+        setMonthlyPayments(total);
+      }
+    } catch (err) {
+      console.error("Monthly payments fetch error:", err);
+    } finally {
+      setSpendingBalanceLoading(false);
+    }
+  };
+  // ========== Update Spending Balance whenever data changes ==========
+  useEffect(() => {
+    setSpendingBalance(monthlyIncome - savingTarget - monthlyPayments);
+  }, [monthlyIncome, savingTarget, monthlyPayments]);
+
+  useEffect(()=>{console.log(spendingBalance,monthlyPayments)},[spendingBalance])
   // ========== Fetch Monthly Income ==========
   const fetchMonthlyIncome = async () => {
     setSpendingBalanceLoading(true);
@@ -77,27 +106,12 @@ const SpendingBalance = () => {
 
       setSavingTarget(convertedTarget);
     } catch (err) {
-      console.log(
-        "Saving target fetch error:",
-        err
-      );
+      console.log("Saving target fetch error:", err);
     } finally {
       setSpendingBalanceLoading(false);
     }
   };
 
-  // ========== Update Spending Balance whenever data changes ==========
-  useEffect(() => {
-    setSpendingBalance(monthlyIncome - savingTarget);
-  }, [monthlyIncome, savingTarget]);
-
-  // ========== Fetch Currency Symbol ==========
-  useEffect(() => {
-    const getCurrSym = async () => {
-      setCurrencySymbol(await GetCurrencySymbol());
-    };
-    getCurrSym();
-  }, [useAsyncStorage("currency")]);
 
   // ========== Reaction Image Change ==========
   useEffect(() => {
@@ -114,6 +128,7 @@ const SpendingBalance = () => {
     }).start();
     fetchMonthlyIncome();
     fetchMonthlySavingTarget();
+    fetchMonthlyPayments();
   };
 
   // ========== Auto-fetch on Focus ==========
@@ -179,7 +194,9 @@ const SpendingBalance = () => {
         </View>
 
         <StyledChip
-          onPress={()=>{router.push("/userpanel/dashboard/spendingHistory")}}
+          onPress={() => {
+            router.push("/userpanel/dashboard/spendingHistory");
+          }}
           color={theme?.colors.text}
           buttonStyle={{ padding: 3 }}
           titleStyle={{ color: theme?.colors.primary }}

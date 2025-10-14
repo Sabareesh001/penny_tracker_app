@@ -132,7 +132,7 @@ const getTheme = (colorScheme:string):Theme=>{
       border: {
         radius: 5,
         borderWidth: 1,
-        color: darkTheme.colors.strokeNeutral,
+        color: "#555555",
         padding: 15,
       },
       text: {

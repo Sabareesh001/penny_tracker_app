@@ -6,7 +6,7 @@ const Button = (props:ButtonProps & {height?:number})=>{
     const spinnerColor = !props.disabled?theme?.colors.secondary:theme?.colors.primary
     const styles = StyleSheet.create({
        title:{
-          color:theme?.colors.secondary
+          color:theme?.colors.text
        },
        loading:{
         

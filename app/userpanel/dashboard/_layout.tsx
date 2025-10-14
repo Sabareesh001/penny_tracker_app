@@ -9,17 +9,20 @@ export default function Layout() {
       screenOptions={{
         headerShown: false,
         contentStyle: {
-          backgroundColor: "transparent",
+          backgroundColor: theme?.colors.secondary,
           padding: 16,
         },
       }}
     >
       <Stack.Screen name="userpanel/dashboard" />
-      <Stack.Screen name="userpanel/dashboard/trackingDetails" />
+      <Stack.Screen options={{
+        presentation: "containedModal",
+        animation:"flip"
+      }} name="userpanel/dashboard/trackingDetails" />
       <Stack.Screen
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          animation: "flip",
           contentStyle: {
             backgroundColor: "transparent", // only for this modal
           },

@@ -25,11 +25,14 @@ export default function Ledger() {
   const [monthySavingsTarget, setMonthySavingsTarget] = useState(0.0);
   const [originalMonthlySavingsTarget, setOriginalMonthlySavingsTarget] =
     useState(0.0);
+  const [alertPercentage, setAlertPercentage] = useState(0); // NEW
+  const [originalAlertPercentage, setOriginalAlertPercentage] = useState(0); // NEW
   const [currencySymbol, setCurrencySymbol] = useState("");
   const [incomeSaveLoading, setIncomeSaveLoading] = useState(false);
   const [savingTargetSaveLoading, setSavingTargetSaveLoading] = useState(false);
   const [monthyIncomeLoading, setMonthlyIncomeLoading] = useState(false);
   const [monthySavingLoading, setSavingIncomeLoading] = useState(false);
+  const [alertSaveLoading, setAlertSaveLoading] = useState(false); // NEW
 
   const styles = StyleSheet.create({
     pageContainer: {
@@ -161,6 +164,41 @@ export default function Ledger() {
       });
   };
 
+  const saveAlertPercentage = async () => {
+    setAlertSaveLoading(true);
+    axios
+      .patch(`${BASE_URL}/api/v1/alert/percentage`, {
+        alert_percentage: alertPercentage,
+      })
+      .then((res) => {
+        setOriginalAlertPercentage(alertPercentage);
+        Toast.show({
+          type: "success",
+          text1: res.data.message,
+        });
+      })
+      .catch((err) => {
+        Toast.show({
+          type: "error",
+          text1: err.response?.data?.error || "Failed to save",
+        });
+      })
+      .finally(() => {
+        setAlertSaveLoading(false);
+      });
+  };
+
+  const fetchAlertPercentage = () => {
+    axios
+      .get(`${BASE_URL}/api/v1/alert/percentage`)
+      .then((res) => {
+        const value = res.data.data.alert_percentage;
+        setAlertPercentage(value);
+        setOriginalAlertPercentage(value);
+      })
+      .catch((err) => console.log(err.response));
+  };
+
   useFocusEffect(
     useCallback(() => {
       fetchMonthlyIncome();
@@ -234,6 +272,30 @@ export default function Ledger() {
           loading={savingTargetSaveLoading}
           containerStyle={{ flex: 2 }}
           disabled={originalMonthlySavingsTarget === monthySavingsTarget}
+          icon={
+            <AntDesign name="save" size={20} color={theme?.colors.secondary} />
+          }
+        />
+      </View>
+      <Label>Alert Percentage</Label>
+      <View style={styles.incomeContainer}>
+        <View style={{ flex: 9 }}>
+          <TextField
+            keyboardType="number-pad"
+            inputMode="numeric"
+            onChangeText={(e) => {
+              const value = Number(e.replace("%", ""));
+              setAlertPercentage(isNaN(value) ? 0 : value);
+            }}
+            editable
+            value={`${alertPercentage}%`}
+          />
+        </View>
+        <Button
+          onPress={saveAlertPercentage}
+          loading={alertSaveLoading}
+          containerStyle={{ flex: 2 }}
+          disabled={originalAlertPercentage === alertPercentage}
           icon={
             <AntDesign name="save" size={20} color={theme?.colors.secondary} />
           }

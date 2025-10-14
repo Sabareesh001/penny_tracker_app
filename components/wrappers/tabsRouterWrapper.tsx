@@ -65,6 +65,13 @@ const StyledTabs = (props: StyledTabsProps) => {
             </Pressable>
           </View>
         ),
+        tabBarBackground: () => {
+          return (
+            <View>
+              
+            </View>
+          )
+        },
         headerStatusBarHeight: 0,
         headerTitleStyle: {
           color: theme?.colors.text,

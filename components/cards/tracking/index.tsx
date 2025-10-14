@@ -157,7 +157,7 @@ const TrackingCard = (props: TrackingCardProps) => {
     trackingName: {
       color: theme?.colors.text,
       fontWeight: "bold",
-      width: 100,
+      width: props.isModal ?"auto":100,
       fontSize: props.isModal ? theme?.text.section.heading.fontSize : 18,
     },
     topIconContainer: {

@@ -23,7 +23,7 @@ export default function UserPanelLayout(){
 
     return (
       <View style={styles.container}>
-        <StyledTabs >
+        <StyledTabs>
           <Tabs.Screen
             name={"dashboard"}
             options={{
@@ -34,19 +34,28 @@ export default function UserPanelLayout(){
               ),
             }}
           />
+          <Tabs.Screen
+            name={"ledger/index"}
+            options={{
+              tabBarLabel: "Ledger",
+              headerTitle: "Ledger",
+              tabBarIcon: ({ color }) => (
+                <FontAwesome size={28} name="book" color={color} />
+              ),
+            }}
+          />
             <Tabs.Screen
-              name={"ledger/index"}
+              name={"payments/index"}
               options={{
-                tabBarLabel: "Ledger",
-                headerTitle: "Ledger",
+                tabBarLabel: "Payments",
+                headerTitle: "Payments",
                 tabBarIcon: ({ color }) => (
-                  <FontAwesome size={28} name="book" color={color} />
+                  <FontAwesome size={28} name="money" color={color} />
                 ),
               }}
             />
           <Tabs.Screen
             name={"settings/index"}
-            
             options={{
               tabBarLabel: "Settings",
               headerTitle: "Settings",

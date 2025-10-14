@@ -51,16 +51,15 @@ export default function TrackingDetails() {
             alignItems: 'center',
             justifyContent: "center",
             gap: theme?.gaps.info,
-            backgroundColor: theme?.colors.primary,
+            backgroundColor: theme?.colors.neutral2,
             padding: theme?.border.padding,
             borderRadius: theme?.border.radius,
             borderColor: theme?.border.color,
             borderWidth: theme?.border.borderWidth
         },
         resourceManagement: {
-            backgroundColor: theme?.colors.primary,
+            backgroundColor: theme?.colors.neutral2,
             flex: 1,
-            color: theme?.colors.secondary,
             padding: theme?.border.padding,
             borderRadius: theme?.border.radius
         },

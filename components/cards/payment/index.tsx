@@ -8,23 +8,11 @@ import { StyleSheet, View } from "react-native";
 
 
 type PaymentCardProps = {
-    color: string,
-}
-
-function lightenColor(hex:string) {
-  const amount = 0.74; 
-  const num = parseInt(hex.slice(1), 16);
-  const r = (num >> 16) & 0xff;
-  const g = (num >> 8) & 0xff;
-  const b = num & 0xff;
-
-  const newR = Math.round(r + (255 - r) * amount -180);
-  const newG = Math.round(g + (255 - g) * amount) -180;
-  const newB = Math.round(b + (255 - b) * amount) -180;
-
-  return `#${((1 << 24) + (newR << 16) + (newG << 8) + newB)
-    .toString(16)
-    .slice(1)}`;
+  color: string,
+  amount: number,
+  label: string,
+  date: string,
+  time:string
 }
 
 
@@ -42,7 +30,7 @@ const PaymentCard = (props:PaymentCardProps) => {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
-        backgroundColor: lightenColor(props.color),
+        backgroundColor:theme?.colors.neutral2,
         padding: theme?.paddings.card,
         borderRadius: theme?.border.radius,
         borderTopLeftRadius: 0,
@@ -54,13 +42,15 @@ const PaymentCard = (props:PaymentCardProps) => {
         },
       
     });
-    return (
+  return (
+      
       <View style={styles.cardContainer}>
         <View style={styles.catergoryColorCode}></View>
         <View style={styles.container}>
-          <Text>{`${currSymbol} 1000`}</Text>
-          <Text>{`12-10-2025`}</Text>
-          <Text>{`12:12`}</Text>
+          <Text>{`${props.label}`}</Text>
+          <Text>{`${currSymbol} ${props.amount}`}</Text>
+          <Text>{`${props.date}`}</Text>
+          <Text>{`${props.time}`}</Text>
           <Ionicons color={theme?.colors.text} size={24} name="eye" />
         </View>
       </View>
