@@ -2,6 +2,7 @@ import { Button } from "@/components/atoms/button/button";
 import { SectionHeading } from "@/components/atoms/heading/heading";
 import { Label } from "@/components/atoms/label/label";
 import { TextField } from "@/components/atoms/textField/textField";
+import { InvalidEntry } from "@/components/toasts/toasts";
 import { usePreferenceContext } from "@/store/currencyContext";
 import { useTheme } from "@/theme/themeProvider";
 import { BASE_URL } from "@/utils/apiHost";
@@ -165,9 +166,13 @@ export default function Ledger() {
   };
 
   const saveAlertPercentage = async () => {
+    if (alertPercentage < 0 || alertPercentage > 100) {
+      InvalidEntry({mustBe:"within 0 to 100"})
+      return;
+    }
     setAlertSaveLoading(true);
     axios
-      .patch(`${BASE_URL}/api/v1/alert/percentage`, {
+      .patch(`${BASE_URL}/api/v1/spending/alert-percentage`, {
         alert_percentage: alertPercentage,
       })
       .then((res) => {
@@ -190,9 +195,9 @@ export default function Ledger() {
 
   const fetchAlertPercentage = () => {
     axios
-      .get(`${BASE_URL}/api/v1/alert/percentage`)
+      .get(`${BASE_URL}/api/v1/spending/alert-percentage`)
       .then((res) => {
-        const value = res.data.data.alert_percentage;
+        const value = res.data.data;
         setAlertPercentage(value);
         setOriginalAlertPercentage(value);
       })
@@ -203,6 +208,7 @@ export default function Ledger() {
     useCallback(() => {
       fetchMonthlyIncome();
       fetchMonthlySavingTarget();
+      fetchAlertPercentage();
     }, [currency])
   );
 

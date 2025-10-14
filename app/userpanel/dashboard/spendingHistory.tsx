@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { PaymentCard } from "@/components/cards/payment";
 import { useTheme } from "@/theme/themeProvider";
 import {
@@ -15,6 +15,7 @@ import { TextField } from "@/components/atoms/textField/textField";
 import axios from "axios";
 import { BASE_URL } from "@/utils/apiHost";
 import { usePreferenceContext } from "@/store/currencyContext";
+import { useFocusEffect } from "expo-router";
 
 export default function SpendingHistory() {
   const { theme } = useTheme();
@@ -119,9 +120,9 @@ export default function SpendingHistory() {
   };
 
   
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
      fetchPayments();
-   }, []);
+   }, []));
   
   
   return (

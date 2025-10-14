@@ -77,6 +77,8 @@ export default function Dashboard() {
     }
   };
 
+  useFocusEffect(useCallback(() => { fetchPaymentsGraph() }, []));
+
   useEffect(() => {
     fetchPaymentsGraph();
   }, []);
